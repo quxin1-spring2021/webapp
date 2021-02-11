@@ -4,7 +4,7 @@ module.exports = basicAuth;
 
 async function basicAuth(req, res, next) {
     // make authenticate path public
-    if (req.path === '/v1') {
+    if (req.path === '/v1/user') {
         return next();
     }
 
@@ -18,16 +18,13 @@ async function basicAuth(req, res, next) {
     const [username, password] = credentials.split(':');
 
     const user = await userService.authenticate({ username, password });
-
+    if (!user) {
+        return res.status(401).json({ message: 'Invalid Authentication Credentials' });
+    }
     (async() => {
         const { password, ...userWithoutPassword } = user;
         req.user = userWithoutPassword
     })()
-
-    if (!user) {
-        return res.status(401).json({ message: 'Invalid Authentication Credentials' });
-    }
-
     // attach user to request object
     //req.user = user
     console.log(req.user);
