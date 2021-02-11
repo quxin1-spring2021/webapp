@@ -2,12 +2,14 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const basicAuth = require("./controllers/basic-auth")
-const app = express();
 const Sequelize = require("sequelize");
 const emailValidator = require("email-validator");
 const bcrypt = require('bcrypt');
 const passwordValidator = require('password-validator');
 const schema = new passwordValidator();
+
+const app = express();
+
 
 // Add properties to password validator schema
 schema
@@ -46,14 +48,12 @@ app.get("/", (req, res) => {
 
 app.get('/v1/user/self', authenticate);
 
-
 function authenticate(req, res, next) {
     let user = '';
     if (req.user) {
         user = req.user;
     }
     res.json(user)
-
 }
 
 
@@ -70,9 +70,9 @@ app.put('/v1/user/self', (req, res) => {
     putBody.passwordHash = bcrypt.hashSync(putBody.password, 10);
 
     if (Object.keys(invalidFields).length !== 0) {
-        res.status(400).send();
+        res.status(400).send('You should not update fileds other than password, firstname, lastname');
     } else if(!schema.validate(putBody.password)){
-        res.status(400).send('weak password')
+        res.status(400).send('Your password is too weak.')
     } else {
         User.update(putBody, {
             where: {
@@ -133,7 +133,7 @@ app.post('/v1/user', async (req, res) => {
                 if (num && num.length !== 0) {
                     existed = true;
                     res.status(400).send({
-                        message: "User exsited."
+                        message: "This email address is already a username, please try other email."
                     });
                 }
             })
