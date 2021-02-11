@@ -23,17 +23,21 @@ module.exports = (sequelize, Sequelize) => {
       lastname: {
         type: Sequelize.STRING,
         allowNull: false,
-      }
-    })
+      },
+      account_created: {
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
+        allowNull: false
+      },
+      account_updated: {
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
+        allowNull: false
+      },      
+    }, {
+      timestamps: false,
+    }
+    )
 
     return User;
-    authenticate;
   };
-
-  async function authenticate({ username, password }) {
-    const user = users.find(u => u.username === username && u.password === password);
-    if (user) {
-        const { password, ...userWithoutPassword } = user;
-        return userWithoutPassword;
-    }
-}

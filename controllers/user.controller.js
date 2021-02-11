@@ -1,6 +1,6 @@
-//const db = require("../models");
-//const Tutorial = db.tutorials;
-const Op = db.Sequelize.Op;
+const db = require("../models");
+const User = db.users;
+//const Op = db.Sequelize.Op;
 
 exports.create = (req, res) => {
   // Validate request
@@ -30,10 +30,11 @@ exports.create = (req, res) => {
     });
 };
 
-exports.findOne = (req, res) => {
-    const id = req.params.id;
-
-    Tutorial.findByPk(id)
+exports.findOne = async (req, res) => {
+    const {username,password, user} = req.body;
+    console.log(user);
+    const theUser = await User.findOne(
+      {where: {username: username}})
       .then(data => {
         res.send(data);
       })
@@ -42,6 +43,16 @@ exports.findOne = (req, res) => {
           message: "Error retrieving Tutorial with id=" + id
         });
       });
+
+    // User.findByPk(id)
+    //   .then(data => {
+    //     res.send(data);
+    //   })
+    //   .catch(err => {
+    //     res.status(500).send({
+    //       message: "Error retrieving Tutorial with id=" + id
+    //     });
+    //   });
   };
 
 
