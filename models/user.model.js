@@ -1,4 +1,3 @@
-
 module.exports = (sequelize, Sequelize) => {
 
 
@@ -13,7 +12,7 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      password: {
+      passwordHash: {
         type: Sequelize.STRING,
         allowNull: false,
       },
