@@ -22,11 +22,9 @@ async function basicAuth(req, res, next) {
         return res.status(401).json({ message: 'Invalid Authentication Credentials' });
     }
     (async() => {
-        const { password, ...userWithoutPassword } = user;
+        const { passwordHash, ...userWithoutPassword } = user;
         req.user = userWithoutPassword
     })()
-    // attach user to request object
-    //req.user = user
-    console.log(req.user);
+
     next();
 }
