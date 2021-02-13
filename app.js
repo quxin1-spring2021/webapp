@@ -141,7 +141,7 @@ app.post('/v1/user', async (req, res) => {
 
             // Save User in the database
             user.passwordHash = bcrypt.hashSync(user.password, 10);
-            await User.create(user)      
+            await User.create(user)
                 .then(data => {
                     created = true;
                 })
