@@ -20,7 +20,7 @@ run `npm install` to install dependencies;
 run `node app.js` to start web application.
 
 Open another terminal window to check **mysql** database;
-run `mysql -u -root -p` then input password to enter mysql command line system;
+run `mysql -u root -p` then input password to enter mysql command line system;
 run `USE TESTDB` to change database;
 run `select * from users;` to check updates of users.
 
