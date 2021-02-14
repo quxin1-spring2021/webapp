@@ -58,10 +58,10 @@ function authenticate(req, res, next) {
 
 
 app.put('/v1/user/self', (req, res) => {
-    const { firstname, lastname, password, ...invalidFields } = req.body
+    const { first_name, last_name, password, ...invalidFields } = req.body
     const putBody = {
-        firstname: firstname,
-        lastname: lastname,
+        first_name: first_name,
+        last_name: last_name,
         password: password,
         account_updated: Sequelize.literal('CURRENT_TIMESTAMP'),
         passwordHash: ''
@@ -70,7 +70,7 @@ app.put('/v1/user/self', (req, res) => {
     putBody.passwordHash = bcrypt.hashSync(putBody.password, 10);
 
     if (Object.keys(invalidFields).length !== 0) {
-        res.status(400).send('You should not update fileds other than password, firstname, lastname');
+        res.status(400).send('You should not update fileds other than password, first_name, last_name');
     } else if(!schema.validate(putBody.password)){
         res.status(400).send('Your password is too weak.')
     } else {
@@ -81,8 +81,9 @@ app.put('/v1/user/self', (req, res) => {
         })
             .then(num => {
                 if (num == 1) {
+                    const user = req.user;
                     res.send({
-                        message: "User was updated successfully."
+                        user
                     });
                 } else {
                     res.send({
@@ -111,8 +112,8 @@ app.post('/v1/user', async (req, res) => {
     const user = {
         username: req.body.username,
         password: req.body.password,
-        firstname: req.body.firstname,
-        lastname: req.body.lastname,
+        first_name: req.body.first_name,
+        last_name: req.body.last_name,
         passwordHash: ''
     };
 

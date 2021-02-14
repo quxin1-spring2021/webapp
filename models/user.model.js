@@ -16,11 +16,11 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      firstname: {
+      first_name: {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      lastname: {
+      last_name: {
         type: Sequelize.STRING,
         allowNull: false,
       },
