@@ -3,10 +3,6 @@ const userService = require('./service');
 module.exports = basicAuth;
 
 async function basicAuth(req, res, next) {
-    // make authenticate path public
-    if (req.path === '/v1/user') {
-        return next();
-    }
 
     // check for basic auth header
     if (!req.headers.authorization || req.headers.authorization.indexOf('Basic ') === -1) {
@@ -23,7 +19,7 @@ async function basicAuth(req, res, next) {
     }
     (async() => {
         const { passwordHash, ...userWithoutPassword } = user;
-        req.user = userWithoutPassword
+        req.user = userWithoutPassword;
     })()
 
     next();
