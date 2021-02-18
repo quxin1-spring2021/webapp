@@ -31,11 +31,12 @@ app.use(cors(corsOptions));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use(basicAuth);
+//app.use(basicAuth);
 
 const db = require("./models");
 
 const User = db.users;
+const Book = db.books;
 
 
 db.sequelize.sync({ force: true }).then(() => {
@@ -46,9 +47,9 @@ app.get("/", (req, res) => {
     res.json({ message: "Welcome to web application." });
 });
 
-app.get('/v1/user/self', authenticate);
+app.get('/v1/user/self', basicAuth, authenticate);
 
-function authenticate(req, res, next) {
+function authenticate(req, res) {
     let user = '';
     if (req.user) {
         user = req.user;
@@ -57,7 +58,7 @@ function authenticate(req, res, next) {
 }
 
 
-app.put('/v1/user/self', (req, res) => {
+app.put('/v1/user/self', basicAuth, (req, res) => {
     const { first_name, last_name, password, ...invalidFields } = req.body
     const putBody = {
         first_name: first_name,
@@ -171,6 +172,116 @@ app.post('/v1/user', async (req, res) => {
     }
 }
 )
+
+
+app.post('/books', basicAuth, async(req,res) => {
+        // Validate request
+        // if (!req.user.username) {
+        //     res.status(400).send({
+        //         message: "Content can not be empty!"
+        //     });
+        //     return;
+        // }
+        // Create a Book
+        const book = {
+            title: req.body.title,
+            author: req.body.author,
+            isbn: req.body.isbn,
+            published_date: req.body.published_date,
+            user_id: req.user.id,
+        };
+
+        let created = false;
+        let existed = false;
+
+        // check if this book is created
+        await Book.findOne(
+            {
+                where: {
+                    isbn: book.isbn,
+                }
+            })
+            .then(num => {
+                if (num && num.length !== 0) {
+                    existed = true;
+                    res.status(400).send({
+                        message: "This book has been created."
+                    });
+                }
+            })
+        if (!existed) {
+
+            // Save Book in the database
+            await Book.create(book)
+                .then(data => {
+                    created = true;
+                })
+                .catch(err => {
+                    res.status(400).send({
+                        message:
+                            err.message || "Some error occurred while creating the Book."
+                    });
+                });
+        }
+
+        if (created) {
+            const newBook = await Book.findOne(
+                {
+                    raw: true,
+                    where: {
+                        isbn: book.isbn,
+                    }
+                });
+            // 201 Created
+            res.status(201).send(newBook);
+        }
+
+    
+})
+
+app.get('/books', async(req,res) => {
+    const books = await Book.findAll();
+    if(books) {
+        res.send(books);
+    }
+
+})
+
+app.get('/books/:id', async (req,res) => {
+    const id = req.params.id;
+    const book = await Book.findOne(
+        {
+            where: {
+                id: id,
+            }
+        })
+    if(book) {
+        res.send(book);
+    } else {
+        res.status(400).send({
+            message: `Cannot find the book with id: ${id}`
+        })
+    }
+})
+
+app.delete('/books/:id', basicAuth, async (req,res) => {
+    const id = req.params.id;
+    await Book.destroy(
+        {
+            where: {
+                id: id,
+            }
+        }
+    )
+    .then(data => {
+        res.status(402);
+    })
+    .catch(err => {
+        res.status(404).send(`Cannot find book with id ${id}`);
+    })
+
+    
+})
 
 const PORT = process.env.PORT || 8080;
 
