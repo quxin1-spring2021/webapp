@@ -266,6 +266,20 @@ app.get('/books/:id', async (req,res) => {
 
 app.delete('/books/:id', basicAuth, async (req,res) => {
     const id = req.params.id;
+
+    let book = await Book.findOne(
+        {
+            where: {
+                id: id,
+            }
+        })
+
+    if(!book) {
+        res.status(404).send({
+            message: `Cannot find the book with id: ${id}`
+        })
+    }
+
     await Book.destroy(
         {
             where: {
@@ -273,12 +287,19 @@ app.delete('/books/:id', basicAuth, async (req,res) => {
             }
         }
     )
-    .then(data => {
-        res.status(402);
-    })
-    .catch(err => {
-        res.status(404).send(`Cannot find book with id ${id}`);
-    })
+
+    book = await Book.findOne(
+        {
+            where: {
+                id: id,
+            }
+        })
+
+    if(!book) {
+        res.status(204).send({
+            message: `Deleted.`
+        });
+    } 
 
     
 })

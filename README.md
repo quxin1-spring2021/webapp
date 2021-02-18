@@ -9,6 +9,14 @@ This Assignment implementing backend APIs for the web application.
 
 `POST ​/v1​/user​`
 
+`GET /books/`
+
+`GET /books/:id`
+
+`POST /books/`
+
+`DELETE /books/:id`
+
 ## Prerequisites
 You have installed **mysql** server on your machine, since the database of this application is based on mysql.
 
@@ -22,10 +30,10 @@ run `node app.js` to start web application.
 Open another terminal window to check **mysql** database;
 run `mysql -u root -p` then input password to enter mysql command line system;
 run `USE TESTDB` to change database;
-run `select * from users;` to check updates of users.
+run `select * from users;` to check all users.
+run `select * from books;` to check books.
 
 ## Test
 run `npm run test` on root directory.
 
-TEST
 Test APIs by sending requests via Postman.
