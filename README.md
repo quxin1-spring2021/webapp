@@ -27,4 +27,5 @@ run `select * from users;` to check updates of users.
 ## Test
 run `npm run test` on root directory.
 
+TEST
 Test APIs by sending requests via Postman.
