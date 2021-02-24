@@ -176,12 +176,7 @@ app.post('/v1/user', async (req, res) => {
 
 app.post('/books', basicAuth, async(req,res) => {
         // Validate request
-        // if (!req.user.username) {
-        //     res.status(400).send({
-        //         message: "Content can not be empty!"
-        //     });
-        //     return;
-        // }
+
         // Create a Book
         const book = {
             title: req.body.title,
@@ -300,7 +295,7 @@ app.delete('/books/:id', basicAuth, async (req,res) => {
             message: `Deleted.`
         });
     } 
-
+6
     
 })
 
