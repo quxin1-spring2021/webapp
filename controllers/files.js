@@ -1,7 +1,7 @@
 const db = require("../models");
-const File = db.file;
+const File = db.files;
 const AWS = require('aws-sdk');
-const UUID = require('uuid/v4');
+const UUID = require('uuidv4');
 const Busboy = require('busboy')
 const S3 = new AWS.S3();
 
@@ -39,7 +39,7 @@ module.exports.addImage = async (req, res) => {
             ContentType: ftype // required
         }
         // we are sending buffer data to s3.
-        S3.upload(params, (err, s3res) => {
+        S3.upload(params, async (err, s3res) => {
             if (err) {
                 res.send({ err, status: 'error' });
             } else {
@@ -96,18 +96,75 @@ module.exports.addImage = async (req, res) => {
 
             // res.send({ data: s3res, status: 'success', msg: 'Image successfully uploaded.' });
         }
-        )}
+        )
+    }
     )
     req.pipe(busboy);
 }
 
-
 module.exports.deleteImage = async (req, res) => {
+    const { id, image_id } = req.params;
+
+    let image = await File.findOne(
+        {
+            where: {
+                file_id: image_id,
+            }
+        })
+
+    if (!image) {
+        res.status(404).send({
+            message: `Cannot find the image with id: ${id}`
+        })
+        return;
+    }
+
+
+    if (image.user_id !== req.user.id) {
+        res.status(401).send({
+            message: `Unauthorized Action.`
+        })
+        return;
+    }
+
+    var params = {
+        Bucket: 'webapp.xin.qu',
+        Key: ''
+    };
+
+    params.Key = image.s3_object_name;
+
+    await File.destroy(
+        {
+            where: {
+                file_id: image_id,
+            }
+        }
+    )
+
+    image = await File.findOne(
+        {
+            where: {
+                file_id: image_id,
+            }
+        })
+
+    if (!image) {
+
+        S3.deleteObject(params, function (err, data) {
+            if (err) console.log(err, err.stack); // an error occurred
+            else {
+                console.log(`File deleted successfully.`);
+            }
+        });
+
+        res.status(204).send({
+            message: `Deleted.`
+        });
+    }
+    return;
 
 }
-
-
-
 
 
 // const uploadFile = (file) => {

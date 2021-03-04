@@ -8,6 +8,10 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: false,
         defaultValue: Sequelize.UUIDV4
       },
+      book_id: {
+        type: Sequelize.UUID,
+        allowNull: false,
+      },
       file_name: {
         type: Sequelize.STRING,
         allowNull: false,
