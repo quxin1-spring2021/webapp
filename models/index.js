@@ -21,5 +21,11 @@ db.sequelize = sequelize;
 
 db.users = require("./user.model.js")(sequelize, Sequelize);
 db.books = require("./book.model.js")(sequelize, Sequelize);
+db.files = require("./file.model")(sequelize, Sequelize);
+
+db.books.belongsTo(db.users, {foreignKey: 'user_id'});
+db.files.belongsTo(db.books, {foreignKey: 'user_id'});
+db.books.hasMany(db.files, {foreignKey: 'user_id'});
+db.users.hasMany(db.books, {foreignKey: 'user_id'});
 
 module.exports = db;

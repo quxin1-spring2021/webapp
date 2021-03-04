@@ -1,4 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const {  } = require('../middleware');
+const basicAuth = require('../middleware/basic-auth');
 const files = require('../controllers/files');
+
+router.post('/', basicAuth, files.addImage);
+
+router.delete('/:image_id', basicAuth, files.deleteImage);
+
+module.exports = router;

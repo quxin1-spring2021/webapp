@@ -14,6 +14,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // Routes
 const userRoutes = require('./routes/users');
 const bookRoutes = require('./routes/books');
+const fileRoutes = require('./routes/files');
 
 // Set Database
 const db = require("./models");
@@ -29,6 +30,7 @@ app.get("/", (req, res) => {
 
 app.use('/v1/user', userRoutes);
 app.use('/books', bookRoutes);
+app.use('/books/:id/image', fileRoutes);
 
 const PORT = process.env.PORT || 8080;
 
