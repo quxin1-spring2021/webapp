@@ -11,10 +11,11 @@
   "license": "ISC",
   "dependencies": {
     "aws-sdk": "^2.857.0",
-    "bcrypt": "^5.0.0",
+    "bcrypt": "^5.0.1",
     "body-parser": "^1.19.0",
     "busboy": "^0.3.1",
     "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
     "email-validator": "^2.0.4",
     "express": "^4.17.1",
     "mysql2": "^2.2.5",

@@ -1,3 +1,7 @@
+if(process.env.NODE_ENV !== "prod") {
+    require('dotenv').config();
+}
+
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
@@ -18,9 +22,9 @@ const fileRoutes = require('./routes/files');
 
 // Set Database
 const db = require("./models");
-
-db.sequelize.sync({ force: true }).then(() => {
-    console.log("Drop and re-sync db.");
+//{ force: true }
+db.sequelize.sync().then(() => {
+    console.log("Re-sync db.");
 });
 
 

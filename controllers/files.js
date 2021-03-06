@@ -1,11 +1,13 @@
 const db = require("../models");
 const File = db.files;
 const AWS = require('aws-sdk');
-const UUID = require('uuidv4');
+const UUID = require('uuidv').v4;
 const Busboy = require('busboy')
 const S3 = new AWS.S3();
 
 module.exports.addImage = async (req, res) => {
+
+    const { id } = req.params;
 
     let image = {
     }
@@ -33,7 +35,7 @@ module.exports.addImage = async (req, res) => {
     busboy.on('finish', function () {
         const userId = UUID();
         const params = {
-            Bucket: 'webapp.xin.qu', // your s3 bucket name
+            Bucket: process.env.BUCKET_NAME, // your s3 bucket name
             Key: `${userId}/${fname}`,
             Body: Buffer.concat(chunks), // concatinating all chunks
             ContentType: ftype // required
@@ -48,6 +50,7 @@ module.exports.addImage = async (req, res) => {
                 image.s3_object_name = params.Key;
                 image.file_id = userId;
                 image.user_id = req.user.id;
+                image.book_id = id;
 
                 let created = false;
                 let existed = false;
@@ -119,7 +122,6 @@ module.exports.deleteImage = async (req, res) => {
         return;
     }
 
-
     if (image.user_id !== req.user.id) {
         res.status(401).send({
             message: `Unauthorized Action.`
@@ -131,6 +133,13 @@ module.exports.deleteImage = async (req, res) => {
         Bucket: 'webapp.xin.qu',
         Key: ''
     };
+
+    if (image.book_id !== id) {
+        res.status(404).send({
+            message: `This image doesn't belong to this book.`
+        })
+        return;
+    }
 
     params.Key = image.s3_object_name;
 
@@ -165,46 +174,3 @@ module.exports.deleteImage = async (req, res) => {
     return;
 
 }
-
-
-// const uploadFile = (file) => {
-//     // Read content from the file
-//     const fileContent = fs.readFileSync(file);
-
-//     // Setting up S3 upload parameters
-//     const params = {
-//         Bucket: process.argv[2],
-//         Key: '', // File name you want to save as in S3
-//         Body: fileContent
-//     };
-
-//     params.Key = path.basename(file);
-
-//     // Uploading files to the bucket
-//     s3.upload(params, function(err, data) {
-//         if (err) {
-//             throw err;
-//         }
-//         console.log(`File uploaded successfully. ${data.Location}`);
-//     });
-// };
-
-// const deleteFile =  (file) => {
-//     var params = {
-//         Bucket: process.argv[2],
-//         Key: ''
-//      };
-
-//          params.Key = path.basename(file);
-
-//      s3.deleteObject(params, function(err, data) {
-//        if (err) console.log(err, err.stack); // an error occurred
-//        else   {
-//           console.log(`File deleted successfully.`);
-//        }            // successful response
-//        /*
-//        data = {
-//        }
-//        */
-//      });
-//   }

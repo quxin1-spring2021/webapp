@@ -1,5 +1,6 @@
 const db = require("../models");
 const Book = db.books;
+const File = db.files;
 
 module.exports.createBook = async (req, res) => {
     // Validate request
@@ -214,6 +215,14 @@ module.exports.deleteBook = async (req, res) => {
         }) 
         return;
     }
+
+    await File.destroy(
+        {
+            where: {
+                book_id: id,
+            }
+        }
+    )
 
     await Book.destroy(
         {
