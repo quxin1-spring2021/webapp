@@ -54,3 +54,16 @@ jobs:
           ls -al
           echo Add other actions to build,
           echo test, and deploy your project.
+
+      - name: Configure AWS crednetials
+        uses: aws-actions/configure-aws-credentials@v1
+        with: 
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+      
+      - name: Copy Artifact to S3
+        run: |
+          pwd
+          aws s3 sync ../codedeploy_artifact s3://${{ secrets.S3_CODEDEPLOY_BUCKET }}
+
