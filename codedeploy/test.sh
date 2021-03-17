@@ -7,3 +7,4 @@ export RDS_PASSWORD
 export RDS_DATABASE
 export RDS_PORT
 export BUCKET_NAME
+sudo node app.js
