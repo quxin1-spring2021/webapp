@@ -1,1 +1,3 @@
-sudo echo this is a test.
+#! /bin/bash
+cd aws-codedeploy/
+sudo npm install

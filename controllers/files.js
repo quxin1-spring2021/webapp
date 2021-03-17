@@ -1,7 +1,7 @@
 const db = require("../models");
 const File = db.files;
 const AWS = require('aws-sdk');
-const UUID = require('uuidv').v4;
+const UUID = require('uuid').v4;
 const Busboy = require('busboy')
 const S3 = new AWS.S3();
 
