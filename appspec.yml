@@ -2,11 +2,19 @@ version: 0.0
 os: linux
 
 files:
-  - source: ./build/libs/ROOT.war
-    destination: /var/lib/tomcat7/webapps
+  - source: /
+    destination: /home/ubuntu/aws-codedeploy
+
+permissions:
+  - object: /home/ubuntu
+    owner: ubuntu
+    group: ubuntu
+    type:
+      - directory
+      - file
 
 hooks:
   AfterInstall:
-   - location: ./restartTomcat.sh
+   - location: ./codedeploy/test.sh
      timeout: 180
-     runas: centos
+     runas: ubuntu
