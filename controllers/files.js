@@ -12,6 +12,20 @@ module.exports.addImage = async (req, res) => {
     let image = {
     }
 
+    let book = await Book.findOne(
+        {
+            where: {
+                id: id,
+            }
+        })
+    
+    if (!book) {
+        res.status(404).send({
+            message: `Cannot find the book with id: ${id}`
+        })
+        return;
+    }
+
     let chunks = [], fname, ftype, fEncoding;
     let busboy = new Busboy({ headers: req.headers });
     busboy.on('file', function (fieldname, file, filename, encoding, mimetype) {
@@ -130,7 +144,7 @@ module.exports.deleteImage = async (req, res) => {
     }
 
     var params = {
-        Bucket: 'webapp.xin.qu',
+        Bucket: process.env.BUCKET_NAME,
         Key: ''
     };
 
