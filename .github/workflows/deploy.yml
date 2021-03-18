@@ -75,6 +75,6 @@ jobs:
             --region ${{ env.AWS_REGION }} \
             --description "Ignore ApplicationStop failures due to broken script" \
           
-          aws deploy list-deployments --application-name ${{ env.CODEDEPLOY_APPLICATION_NAME }} --deployment-group-name ${{ env.CODEDEPLOY_APPLICATION_DEPLOYMENT_GROUP_NAME }} --query "deployments" --output text
-          aws deploy get-deployment --deployment-id deployment-id --query "deploymentInfo.[status, creator]" --output text
+          deployment-id=$(aws deploy list-deployments --application-name ${{ env.CODEDEPLOY_APPLICATION_NAME }} --deployment-group-name ${{ env.CODEDEPLOY_APPLICATION_DEPLOYMENT_GROUP_NAME }} --query "deployments" --output text)
+          aws deploy get-deployment --deployment-id "$deployment-id" --query "deploymentInfo.[status, creator]" --output text
 
