@@ -3,7 +3,7 @@ os: linux
 
 files:
   - source: /
-    destination: /var/www/webapp
+    destination: /home/ubuntu/webapp
 
 permissions:
   - object: /home/ubuntu
