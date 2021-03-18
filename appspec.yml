@@ -16,5 +16,5 @@ permissions:
 hooks:
   AfterInstall:
    - location: ./codedeploy/test.sh
-     timeout: 180
+     timeout: 1000
      runas: ubuntu
