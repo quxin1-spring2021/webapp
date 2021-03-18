@@ -2,7 +2,7 @@
 cd /home/ubuntu
 pwd
 ls -al
-cd /var/www/webapp
+cd /home/ubuntu/webapp
 pwd
 ls -al
 sudo npm install
