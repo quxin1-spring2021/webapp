@@ -1,5 +1,5 @@
 #! /bin/bash
-cp /home/ubuntu/webapp/webapp.service /etc/systemd/system
+sudo cp /home/ubuntu/webapp/webapp.service /etc/systemd/system
 ##add exceutable permissions to express app
 sudo chmod +x /home/ubuntu/webapp
 ##Allows any users to write the app folder. Useful if using fs within the app
