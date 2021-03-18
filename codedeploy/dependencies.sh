@@ -2,9 +2,7 @@
 cd /home/ubuntu
 pwd
 ls -al
-cd aws-codedeploy/
+cd /var/www/webapp
 pwd
 ls -al
 sudo npm install
-sudo npx kill-port 8080
-sudo node app.js

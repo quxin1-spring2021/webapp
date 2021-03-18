@@ -1,0 +1,17 @@
+[Unit]
+Description=webapp
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/node /var/www/WebApp/webapp.js
+Restart=always
+RestartSec=500ms
+StartLimitInterval=0
+User=nobody
+Group=nogroup
+Environment=PATH=/usr/bin:/usr/local/bin
+Environment=NODE_ENV=production
+WorkingDirectory=/var/www/YourAppName
+
+[Install]
+WantedBy=multi-use.target

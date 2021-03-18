@@ -3,7 +3,7 @@ os: linux
 
 files:
   - source: /
-    destination: /home/ubuntu/aws-codedeploy
+    destination: /var/www/webapp
 
 permissions:
   - object: /home/ubuntu
@@ -14,7 +14,15 @@ permissions:
       - file
 
 hooks:
+  BeforeInstall:
+   - location: ./codedeploy/cleanup.sh
+     timeout: 180
+     runas: ubuntu
   AfterInstall:
-   - location: ./codedeploy/test.sh
-     timeout: 1000
+   - location: ./codedeploy/dependencies.sh
+     timeout: 180
+     runas: ubuntu
+  ApplicationStart:
+   - location: ./codedeploy/start.sh
+     timeout: 180
      runas: ubuntu
