@@ -34,7 +34,7 @@ app.get("/", (req, res) => {
 });
 
 app.use('/v1/user', userRoutes);
-app.use('/books', bookRoutes);
+app.use('/mybooks', bookRoutes);
 //app.use('/books/:id/image', fileRoutes);
 
 const PORT = process.env.PORT || 8080;
