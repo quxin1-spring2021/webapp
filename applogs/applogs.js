@@ -18,7 +18,8 @@ const logger = winston.createLogger({
         //
         new winston.transports.File({ filename: '/home/ubuntu/webapp/applogs/error.log', level: 'error' }),
         new winston.transports.File({ filename: '/home/ubuntu/webapp/applogs/webapp-combined.log' })
-    ]
+    ],
+    exitOnError: false,
 });
 
 
