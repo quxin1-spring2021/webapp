@@ -85,6 +85,10 @@ module.exports.createUser = async (req, res) => {
                 });
 
             const { passwordHash, ...userWithoutPassword } = newUser
+            logger.log({
+                level: 'info',
+                message: 'A new User is created.'
+            });
             // 201 Created
             res.status(201).send(userWithoutPassword);
         }

@@ -192,6 +192,10 @@ module.exports.showAllBook = async (req, res) => {
             return resObj;
         })
     if (books) {
+        logger.log({
+            level: 'info',
+            message: 'get all books'
+        });
         client.increment('get_all_books');
         res.send(books);
     }
