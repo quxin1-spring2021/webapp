@@ -1,5 +1,5 @@
 #! /bin/bash
-if(process.env.NODE_ENV !== "prod") {
+if (process.env.NODE_ENV !== "prod") {
     require('dotenv').config();
 }
 
@@ -7,6 +7,25 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const app = express();
+const logger = require("./logs/logs");
+
+logger.log({
+    level: 'info',
+    message: 'Webapp Started'
+});
+
+logger.info({
+    message: 'Use a helper method if you want',
+    additional: 'properties',
+    are: 'passed along'
+});
+
+logger.log('info', 'test message %s, %s', 'first', 'second', { number: 123 });
+logger.info('Found %s at %s', 'error', new Date());
+logger.info('Found %s at %s', 'error', new Error('chill winston'));
+
+logger.warn(new Error('Error passed as info'));
+logger.log('error', new Error('Error passed as message'));
 
 var corsOptions = {
     origin: "http://localhost:8081"

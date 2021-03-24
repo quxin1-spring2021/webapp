@@ -5,6 +5,8 @@ const AWS = require('aws-sdk');
 const UUID = require('uuid').v4;
 const Busboy = require('busboy')
 const S3 = new AWS.S3();
+const logger = require("../logs/logs");
+
 
 module.exports.addImage = async (req, res) => {
 
@@ -24,6 +26,7 @@ module.exports.addImage = async (req, res) => {
         res.status(404).send({
             message: `Cannot find the book with id: ${id}`
         })
+
         return;
     }
 

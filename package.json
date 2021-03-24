@@ -22,7 +22,8 @@
     "password-validator": "^5.1.1",
     "sequelize": "^6.5.0",
     "uuid": "^8.3.2",
-    "uuidv4": "^6.2.6"
+    "uuidv4": "^6.2.6",
+    "winston": "^3.3.3"
   },
   "devDependencies": {
     "mocha": "^8.2.1"
