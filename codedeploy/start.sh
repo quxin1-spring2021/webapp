@@ -6,6 +6,14 @@ sudo chmod +x /home/ubuntu/webapp
 sudo chmod go+w /var/www/webapp
 ##Launches the express app
 sudo npx kill-port 8080
-sudo systemctl daemon-reload
-sudo systemctl start webapp
-sudo systemctl enable webapp
+# sudo systemctl daemon-reload
+# sudo systemctl start webapp
+# sudo systemctl enable webapp
+
+sudo nohup node app.js > /dev/null 2> /dev/null < /dev/null &
+
+echo "starting application on 8080"
+
+
+
+
