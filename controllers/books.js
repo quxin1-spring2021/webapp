@@ -1,7 +1,7 @@
 const db = require("../models");
 const Book = db.books;
 const File = db.files;
-const logger = require("../logs/logs");
+const logger = require("../applogs/applogs");
 
 
 module.exports.createBook = async (req, res) => {

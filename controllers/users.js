@@ -5,7 +5,7 @@ const emailValidator = require("email-validator");
 const bcrypt = require('bcrypt');
 const passwordValidator = require('password-validator');
 const schema = new passwordValidator();
-const logger = require("../logs/logs");
+const logger = require("../applogs/applogs");
 
 
 // Add properties to password validator schema
