@@ -16,8 +16,8 @@ module.exports.logger = winston.createLogger({
         // - Write to all logs with level `info` and below to `quick-start-combined.log`.
         // - Write all logs error (and below) to `quick-start-error.log`.
         //
-        new winston.transports.File({ filename: './logs/error.log', level: 'error' }),
-        new winston.transports.File({ filename: './logs/webapp-combined.log' })
+        new winston.transports.File({ filename: './applogs/error.log', level: 'error' }),
+        new winston.transports.File({ filename: './applogs/webapp-combined.log' })
     ]
 });
 

@@ -2,7 +2,9 @@ const db = require("../models");
 const Book = db.books;
 const File = db.files;
 const logger = require("../applogs/applogs");
+const StatsD = require("node-statsd");
 
+client = new StatsD();
 
 module.exports.createBook = async (req, res) => {
     // Validate request
@@ -188,6 +190,7 @@ module.exports.showAllBook = async (req, res) => {
             return resObj;
         })
     if (books) {
+        client.increment('get_all_books');
         res.send(books);
     }
 }
