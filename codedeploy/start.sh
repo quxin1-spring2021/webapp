@@ -10,10 +10,8 @@ sudo npx kill-port 8080
 # sudo systemctl start webapp
 # sudo systemctl enable webapp
 
-sudo nohup node app.js > /dev/null 2> /dev/null < /dev/null &
+cd /home/ubuntu/webapp/
+
+sudo nohup node webapp.js > /dev/null 2> /dev/null < /dev/null &
 
 echo "starting application on 8080"
-
-
-
-
