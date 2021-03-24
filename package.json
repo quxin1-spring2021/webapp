@@ -18,6 +18,7 @@
     "dotenv": "^8.2.0",
     "email-validator": "^2.0.4",
     "express": "^4.17.1",
+    "hot-shots": "^8.3.0",
     "mysql2": "^2.2.5",
     "node-statsd": "^0.1.1",
     "password-validator": "^5.1.1",
