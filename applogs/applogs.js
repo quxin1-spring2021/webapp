@@ -1,6 +1,6 @@
 const winston = require('winston');
 
-module.exports.logger = winston.createLogger({
+const logger = winston.createLogger({
     level: 'info',
     format: winston.format.combine(
         winston.format.timestamp({
@@ -16,8 +16,8 @@ module.exports.logger = winston.createLogger({
         // - Write to all logs with level `info` and below to `quick-start-combined.log`.
         // - Write all logs error (and below) to `quick-start-error.log`.
         //
-        new winston.transports.File({ filename: './applogs/error.log', level: 'error' }),
-        new winston.transports.File({ filename: './applogs/webapp-combined.log' })
+        new winston.transports.File({ filename: '/home/ubuntu/webapp/applogs/error.log', level: 'error' }),
+        new winston.transports.File({ filename: '/home/ubuntu/webapp/applogs/webapp-combined.log' })
     ]
 });
 
@@ -30,3 +30,5 @@ if (process.env.NODE_ENV !== 'production') {
         )
     }));
 }
+
+module.exports = logger;

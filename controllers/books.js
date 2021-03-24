@@ -2,7 +2,7 @@ const db = require("../models");
 const Book = db.books;
 const File = db.files;
 const logger = require("../applogs/applogs");
-const StatsD = require("node-statsd");
+const StatsD = require("hot-shots");
 
 client = new StatsD();
 
@@ -88,6 +88,7 @@ module.exports.createBook = async (req, res) => {
                 return newObj;
             });
         // 201 Created
+        client.increment('created_new_book');
         res.status(201).send(newBook);
     }
 }
@@ -141,6 +142,7 @@ module.exports.showBook = async (req, res) => {
         })
 
     if (book) {
+        client.increment('get_a_book');
         res.send(book);
     } else {
         res.status(400).send({
