@@ -100,7 +100,7 @@ module.exports.createBook = async (req, res) => {
         // 201 Created
         logger.log({
             level: 'info',
-            message: `created a new book, id: ${id}`
+            message: `created a new book, id: ${newBook.id}`
         });
         client.increment('POST_BOOK_API');
         res.status(201).send(newBook);
