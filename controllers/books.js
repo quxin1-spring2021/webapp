@@ -90,7 +90,7 @@ module.exports.createBook = async (req, res) => {
             level: 'info',
             message: `created a new book, id: ${id}`
         });
-        client.increment('created_new_book');
+        client.increment('POST_BOOK_API');
         res.status(201).send(newBook);
     }
 }
@@ -151,7 +151,7 @@ module.exports.showBook = async (req, res) => {
             level: 'info',
             message: `get a book, id: ${id}`
         });
-        client.increment('get_a_book');
+        client.increment('GET_BOOK_API');
     } else {
         res.status(400).send({
             message: `Cannot find the book with id: ${id}`
@@ -159,7 +159,7 @@ module.exports.showBook = async (req, res) => {
     }
 
     const getBookTime = new Date() - start_time
-    client.timing('get_a_book_API_time', getBookTime);
+    client.timing('GET_BOOK_API_time', getBookTime);
 }
 
 
@@ -210,15 +210,17 @@ module.exports.showAllBook = async (req, res) => {
             message: 'get all books request'
         });
         res.send(books);
-        client.increment('get_all_books');
+        client.increment('GET_BOOKS_API');
     }
     const getBookTime = new Date() - start_time
-    client.timing('get_all_book_API_time', getBookTime);
+    client.timing('GET_BOOKS_API_time', getBookTime);
 }
 
 
 module.exports.deleteBook = async (req, res) => {
     const id = req.params.id;
+    const start_time = new Date();
+
 
     let book = await Book.findOne(
         {
@@ -270,10 +272,12 @@ module.exports.deleteBook = async (req, res) => {
             level: 'info',
             message: 'A Book is Deleted'
         });
-        client.increment('delete_a_book');
         res.status(204).send({
             message: `Deleted.`
         });
+        client.increment('DELETE_BOOK_API');
+        const deleteBookTime = new Date() - start_time
+        client.timing('DELETE_BOOK_API_time', deleteBookTime);
     }
     return;
 

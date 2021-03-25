@@ -48,7 +48,7 @@ module.exports.addImage = async (req, res) => {
         file.on('end', function () {
             console.log('File [' + filename + '] Finished');
         });
-        client.increment('uploaded_an_object_to_s3');
+
     });
 
     busboy.on('finish', function () {
@@ -60,11 +60,15 @@ module.exports.addImage = async (req, res) => {
             ContentType: ftype // required
         }
         // we are sending buffer data to s3.
+        const s3StartTime = new Date();
 
         S3.upload(params, async (err, s3res) => {
             if (err) {
                 res.send({ err, status: 'error' });
             } else {
+
+                const s3CostTime = new Date() - s3StartTime;
+                client.timing('S3_UPLOAD_time', s3CostTime);
 
                 image.file_name = fname;
                 image.s3_object_name = params.Key;
@@ -119,9 +123,9 @@ module.exports.addImage = async (req, res) => {
                         level: 'info',
                         message: `created a new image, id: ${image.file_id}`
                     });
-                    client.increment('created_a_new_image');
+                    client.increment('POST_IMAGE_API');
                     const apiCostTime = new Date() - apiStartTime;
-                    client.timing('new_image_api_time', apiCostTime);
+                    client.timing('POST_IMAGE_API_time', apiCostTime);
                 }
             }
 
@@ -189,10 +193,13 @@ module.exports.deleteImage = async (req, res) => {
 
     if (!image) {
 
+        const s3StartTime = new Date();
         S3.deleteObject(params, function (err, data) {
             if (err) console.log(err, err.stack); // an error occurred
             else {
                 console.log(`File deleted successfully.`);
+                const s3CostTime = new Date() - s3StartTime;
+                client.timing('S3_DELETE_time', s3CostTime);
             }
         });
 
@@ -203,9 +210,9 @@ module.exports.deleteImage = async (req, res) => {
             level: 'info',
             message: `deleted a image`
         });
-        client.increment('deleted_an_image');
+        client.increment('DELETE_IMAGE_API');
         const apiCostTime = new Date() - apiStartTime;
-        client.timing('delete_a_image_api_time', apiCostTime);
+        client.timing('DELETE_IMAGE_API_time', apiCostTime);
     }
     return;
 

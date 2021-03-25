@@ -89,7 +89,7 @@ module.exports.createUser = async (req, res) => {
                 message: 'A new User is created.'
             });
             // 201 Created
-            client.increment('created_a_new_user');
+            client.increment('POST_USER_API');
         }
 
     }
@@ -127,7 +127,7 @@ module.exports.updateUser = (req, res) => {
                         level: 'info',
                         message: `User(id:${user.id}) is updated.`
                     });
-                    client.increment('updated_a_user');
+                    client.increment('PUT_USER_API');
                 } else {
                     res.send({
                         message: `Cannot update User with username=${req.user.username}. Maybe Username was not found or req.body is empty!`
@@ -150,7 +150,7 @@ module.exports.showUser = (req, res) => {
             level: 'info',
             message: `Info of User(id:${user.id}) is queried.`
         });
-        client.increment('get_user_info');
+        client.increment('GET_USER_API');
     }
     res.json(user)
 }
