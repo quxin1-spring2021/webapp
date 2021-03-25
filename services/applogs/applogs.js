@@ -12,8 +12,8 @@ const logger = winston.createLogger({
     ),
     defaultMeta: { service: 'csye6225-webapp' },
     transports: [
-        new winston.transports.File({ filename: '/home/ubuntu/webapp/applogs/error.log', level: 'error' }),
-        new winston.transports.File({ filename: '/home/ubuntu/webapp/applogs/webapp-combined.log' })
+        new winston.transports.File({ filename: '/home/ubuntu/webapp/services/applogs/error.log', level: 'error' }),
+        new winston.transports.File({ filename: '/home/ubuntu/webapp/services/applogs/webapp-combined.log' })
     ]
 });
 
