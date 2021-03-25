@@ -5,6 +5,9 @@ const emailValidator = require("email-validator");
 const bcrypt = require('bcrypt');
 const passwordValidator = require('password-validator');
 const schema = new passwordValidator();
+const logger = require("../services/applogs/applogs");
+const client = require("../services/metrics/metrics");
+
 
 // Add properties to password validator schema
 schema
@@ -16,10 +19,9 @@ schema
     .has().not().spaces()                           // Should not have spaces
     .is().not().oneOf(['Passw0rd', 'Password123']); // Blacklist these values
 
-
-
-
 module.exports.createUser = async (req, res) => {
+    const start_time = new Date();
+
     // Validate request
     if (!req.body.username) {
         res.status(400).send({
@@ -45,6 +47,9 @@ module.exports.createUser = async (req, res) => {
         let existed = false;
         await User.findOne(
             {
+                logging: (sql, queryTime) => {
+                    client.timing('SQL_FIND_IMAGE', queryTime)
+                },
                 where: {
                     username: user.username,
                 }
@@ -61,7 +66,11 @@ module.exports.createUser = async (req, res) => {
 
             // Save User in the database
             user.passwordHash = bcrypt.hashSync(user.password, 10);
-            await User.create(user)
+            await User.create(user,{
+                logging: (sql, queryTime) => {
+                    client.timing('SQL_CREATE_USER', queryTime)
+                }
+            })
                 .then(data => {
                     created = true;
                 })
@@ -76,6 +85,9 @@ module.exports.createUser = async (req, res) => {
         if (created) {
             const newUser = await User.findOne(
                 {
+                    logging: (sql, queryTime) => {
+                        client.timing('SQL_FIND_IMAGE', queryTime)
+                    },
                     raw: true,
                     where: {
                         username: user.username,
@@ -83,14 +95,23 @@ module.exports.createUser = async (req, res) => {
                 });
 
             const { passwordHash, ...userWithoutPassword } = newUser
-            // 201 Created
             res.status(201).send(userWithoutPassword);
+            logger.log({
+                level: 'info',
+                message: 'A new User is created.'
+            });
+            // 201 Created
+            client.increment('POST_USER_API');
+            const apiCostTime = new Date() - start_time
+            client.timing('POST_USER_API_time', apiCostTime);
         }
 
     }
 }
 
 module.exports.updateUser = (req, res) => {
+    const start_time = new Date();
+
     const { first_name, last_name, password, ...invalidFields } = req.body
     const putBody = {
         first_name: first_name,
@@ -108,6 +129,9 @@ module.exports.updateUser = (req, res) => {
         res.status(400).send('Your password is too weak.')
     } else {
         User.update(putBody, {
+            logging: (sql, queryTime) => {
+                client.timing('SQL_UPDATE_USER', queryTime)
+            },
             where: {
                 username: req.user.username
             }
@@ -118,6 +142,13 @@ module.exports.updateUser = (req, res) => {
                     res.send({
                         user
                     });
+                    logger.log({
+                        level: 'info',
+                        message: `User(id:${user.id}) is updated.`
+                    });
+                    client.increment('PUT_USER_API');
+                    const apiCostTime = new Date() - start_time
+                    client.timing('PUT_USER_API_time', apiCostTime);
                 } else {
                     res.send({
                         message: `Cannot update User with username=${req.user.username}. Maybe Username was not found or req.body is empty!`
@@ -133,9 +164,18 @@ module.exports.updateUser = (req, res) => {
 }
 
 module.exports.showUser = (req, res) => {
+    const start_time = new Date();
+
     let user = '';
     if (req.user) {
         user = req.user;
+        logger.log({
+            level: 'info',
+            message: `Info of User(id:${user.id}) is queried.`
+        });
+        client.increment('GET_USER_API');
+        const apiCostTime = new Date() - start_time
+        client.timing('GET_USER_API_time', apiCostTime);
     }
     res.json(user)
 }

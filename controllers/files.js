@@ -5,9 +5,11 @@ const AWS = require('aws-sdk');
 const UUID = require('uuid').v4;
 const Busboy = require('busboy')
 const S3 = new AWS.S3();
+const logger = require("../services/applogs/applogs");
+const client = require("../services/metrics/metrics");
 
 module.exports.addImage = async (req, res) => {
-
+    const apiStartTime = new Date();
     const { id } = req.params;
 
     let image = {
@@ -15,15 +17,19 @@ module.exports.addImage = async (req, res) => {
 
     let book = await Book.findOne(
         {
+            logging: (sql, queryTime) => {
+                client.timing('SQL_FIND_BOOK', queryTime)
+            },
             where: {
                 id: id,
             }
         })
-    
+
     if (!book) {
         res.status(404).send({
             message: `Cannot find the book with id: ${id}`
         })
+
         return;
     }
 
@@ -45,6 +51,7 @@ module.exports.addImage = async (req, res) => {
         file.on('end', function () {
             console.log('File [' + filename + '] Finished');
         });
+
     });
 
     busboy.on('finish', function () {
@@ -56,10 +63,15 @@ module.exports.addImage = async (req, res) => {
             ContentType: ftype // required
         }
         // we are sending buffer data to s3.
+        const s3StartTime = new Date();
+
         S3.upload(params, async (err, s3res) => {
             if (err) {
                 res.send({ err, status: 'error' });
             } else {
+
+                const s3CostTime = new Date() - s3StartTime;
+                client.timing('S3_UPLOAD_time', s3CostTime);
 
                 image.file_name = fname;
                 image.s3_object_name = params.Key;
@@ -73,8 +85,12 @@ module.exports.addImage = async (req, res) => {
                 // check if this book is created
                 await File.findOne(
                     {
+                        logging: (sql, queryTime) => {
+                            client.timing('SQL_FIND_IMAGE', queryTime)
+                        },
                         where: {
                             file_name: image.file_name,
+                            book_id: id
                         }
                     })
                     .then(num => {
@@ -87,7 +103,11 @@ module.exports.addImage = async (req, res) => {
                     })
                 if (!existed) {
                     // Save Book in the database
-                    await File.create(image)
+                    await File.create(image, {
+                        logging: (sql, queryTime) => {
+                            client.timing('SQL_CREATE_BOOK_TIME', queryTime)
+                        }
+                    })
                         .then(data => {
                             created = true;
                         })
@@ -104,11 +124,22 @@ module.exports.addImage = async (req, res) => {
                     const newImage = await File.findOne(
                         {
                             raw: true,
+                            logging: (sql, queryTime) => {
+                                client.timing('SQL_FIND_IMAGE', queryTime)
+                            },
                             where: {
                                 file_id: image.file_id,
                             }
                         });
+
                     res.status(201).send(newImage);
+                    logger.log({
+                        level: 'info',
+                        message: `created a new image, id: ${image.file_id}`
+                    });
+                    client.increment('POST_IMAGE_API');
+                    const apiCostTime = new Date() - apiStartTime;
+                    client.timing('POST_IMAGE_API_time', apiCostTime);
                 }
             }
 
@@ -121,10 +152,14 @@ module.exports.addImage = async (req, res) => {
 }
 
 module.exports.deleteImage = async (req, res) => {
+    const apiStartTime = new Date();
     const { id, image_id } = req.params;
 
     let image = await File.findOne(
         {
+            logging: (sql, queryTime) => {
+                client.timing('SQL_FIND_IMAGE', queryTime)
+            },
             where: {
                 file_id: image_id,
             }
@@ -160,6 +195,9 @@ module.exports.deleteImage = async (req, res) => {
 
     await File.destroy(
         {
+            logging: (sql, queryTime) => {
+                client.timing('SQL_DELETE_IMAGE', queryTime)
+            },
             where: {
                 file_id: image_id,
             }
@@ -168,6 +206,9 @@ module.exports.deleteImage = async (req, res) => {
 
     image = await File.findOne(
         {
+            logging: (sql, queryTime) => {
+                client.timing('SQL_FIND_IMAGE', queryTime)
+            },
             where: {
                 file_id: image_id,
             }
@@ -175,16 +216,26 @@ module.exports.deleteImage = async (req, res) => {
 
     if (!image) {
 
+        const s3StartTime = new Date();
         S3.deleteObject(params, function (err, data) {
             if (err) console.log(err, err.stack); // an error occurred
             else {
                 console.log(`File deleted successfully.`);
+                const s3CostTime = new Date() - s3StartTime;
+                client.timing('S3_DELETE_time', s3CostTime);
             }
         });
 
         res.status(204).send({
             message: `Deleted.`
         });
+        logger.log({
+            level: 'info',
+            message: `deleted a image`
+        });
+        client.increment('DELETE_IMAGE_API');
+        const apiCostTime = new Date() - apiStartTime;
+        client.timing('DELETE_IMAGE_API_time', apiCostTime);
     }
     return;
 

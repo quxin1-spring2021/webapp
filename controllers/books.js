@@ -1,10 +1,12 @@
 const db = require("../models");
 const Book = db.books;
 const File = db.files;
+const logger = require("../services/applogs/applogs");
+const client = require("../services/metrics/metrics");
 
 module.exports.createBook = async (req, res) => {
     // Validate request
-
+    const startTime = new Date();
     // Create a Book
     const book = {
         title: req.body.title,
@@ -20,6 +22,9 @@ module.exports.createBook = async (req, res) => {
     // check if this book is created
     await Book.findOne(
         {
+            logging: (sql, queryTime) => {
+                client.timing('SQL_FIND_BOOK', queryTime)
+            },
             where: {
                 isbn: book.isbn,
             }
@@ -34,7 +39,12 @@ module.exports.createBook = async (req, res) => {
         })
     if (!existed) {
         // Save Book in the database
-        await Book.create(book)
+        var log = {
+            logging: (sql, queryTime) => {
+                client.timing('SQL_CREATE_BOOK_TIME', queryTime)
+            }
+        }
+        await Book.create(book, log)
             .then(data => {
                 created = true;
             })
@@ -49,6 +59,9 @@ module.exports.createBook = async (req, res) => {
     if (created) {
         const newBook = await Book.findOne(
             {
+                logging: (sql, queryTime) => {
+                    client.timing('SQL_FIND_BOOK', queryTime)
+                },
                 //raw: true,
                 where: {
                     isbn: book.isbn,
@@ -84,15 +97,28 @@ module.exports.createBook = async (req, res) => {
                 return newObj;
             });
         // 201 Created
+
         res.status(201).send(newBook);
+        logger.log({
+            level: 'info',
+            message: `created a new book, id: ${newBook.id}`
+        });
+        client.increment('POST_BOOK_API');
+        const createBookApiTime = new Date() - startTime;
+        client.timing('POST_BOOK_API_time', createBookApiTime)
     }
 }
 
 
 module.exports.showBook = async (req, res) => {
+    const start_time = new Date();
+
     const id = req.params.id;
     const book = await Book.findOne(
         {
+            logging: (sql, queryTime) => {
+                client.timing('SQL_FIND_BOOK', queryTime)
+            },
             where: {
                 id: id
             },
@@ -103,7 +129,7 @@ module.exports.showBook = async (req, res) => {
             ]
         })
         .then(book => {
-            if(book === null) {
+            if (book === null) {
                 return Promise.reject();
             }
 
@@ -138,16 +164,29 @@ module.exports.showBook = async (req, res) => {
 
     if (book) {
         res.send(book);
+        logger.log({
+            level: 'info',
+            message: `get a book, id: ${id}`
+        });
+        client.increment('GET_BOOK_API');
     } else {
         res.status(400).send({
             message: `Cannot find the book with id: ${id}`
         })
     }
+
+    const getBookTime = new Date() - start_time
+    client.timing('GET_BOOK_API_time', getBookTime);
 }
 
 
 module.exports.showAllBook = async (req, res) => {
+    const start_time = new Date();
+
     const books = await Book.findAll({
+        logging: (sql, queryTime) => {
+            client.timing('SQL_FIND_ALL_BOOKs', queryTime)
+        },
         include: [
             {
                 model: db.files
@@ -186,16 +225,28 @@ module.exports.showAllBook = async (req, res) => {
             return resObj;
         })
     if (books) {
+        logger.log({
+            level: 'info',
+            message: 'get all books request'
+        });
         res.send(books);
+        client.increment('GET_BOOKS_API');
     }
+    const getBookTime = new Date() - start_time
+    client.timing('GET_BOOKS_API_time', getBookTime);
 }
 
 
 module.exports.deleteBook = async (req, res) => {
     const id = req.params.id;
+    const start_time = new Date();
+
 
     let book = await Book.findOne(
         {
+            logging: (sql, queryTime) => {
+                client.timing('SQL_FIND_BOOK', queryTime)
+            },
             where: {
                 id: id,
             }
@@ -208,16 +259,19 @@ module.exports.deleteBook = async (req, res) => {
         return;
     }
 
-    
-    if(book.user_id !== req.user.id) {
+
+    if (book.user_id !== req.user.id) {
         res.status(401).send({
             message: `Unauthorized Action.`
-        }) 
+        })
         return;
     }
 
     await File.destroy(
         {
+            logging: (sql, queryTime) => {
+                client.timing('SQL_DELETE_IMAGE', queryTime)
+            },
             where: {
                 book_id: id,
             }
@@ -226,6 +280,9 @@ module.exports.deleteBook = async (req, res) => {
 
     await Book.destroy(
         {
+            logging: (sql, queryTime) => {
+                client.timing('SQL_DELETE_BOOK', queryTime)
+            },
             where: {
                 id: id,
             }
@@ -234,15 +291,25 @@ module.exports.deleteBook = async (req, res) => {
 
     book = await Book.findOne(
         {
+            logging: (sql, queryTime) => {
+                client.timing('SQL_FIND_BOOK', queryTime)
+            },
             where: {
                 id: id,
             }
         })
 
     if (!book) {
+        logger.log({
+            level: 'info',
+            message: 'A Book is Deleted'
+        });
         res.status(204).send({
             message: `Deleted.`
         });
+        client.increment('DELETE_BOOK_API');
+        const deleteBookTime = new Date() - start_time
+        client.timing('DELETE_BOOK_API_time', deleteBookTime);
     }
     return;
 
