@@ -48,10 +48,13 @@ module.exports.createBook = async (req, res) => {
                 client.timing('SQL_CREATE_BOOK_TIME', queryTime)
             }
         }
-        await Book.create({
-            book,
-            log
-        })
+        await Book.create(
+            {
+                book
+            }
+            ,
+                log
+        )
             .then(data => {
                 created = true;
             })
