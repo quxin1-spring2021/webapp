@@ -4,6 +4,13 @@ const File = db.files;
 const logger = require("../services/applogs/applogs");
 const client = require("../services/metrics/metrics");
 
+// function logging() {
+//     return (a,b) => {
+//         const queryTime = b;
+//         client.timing(`${queryName}`, queryTime)
+//     }
+// }
+
 module.exports.createBook = async (req, res) => {
     // Validate request
 
@@ -36,7 +43,13 @@ module.exports.createBook = async (req, res) => {
         })
     if (!existed) {
         // Save Book in the database
-        await Book.create(book)
+        await Book.create({
+            book,
+            logging: (sql, queryTime) => {
+                client.timing('SQL_CREATE_BOOK_TIME', queryTime)
+            }
+
+        })
             .then(data => {
                 created = true;
             })
@@ -102,6 +115,9 @@ module.exports.showBook = async (req, res) => {
     const id = req.params.id;
     const book = await Book.findOne(
         {
+            logging: (sql, queryTime) => {
+                client.timing('SQL_FIND_BOOK', queryTime)
+            },
             where: {
                 id: id
             },
@@ -167,6 +183,9 @@ module.exports.showAllBook = async (req, res) => {
     const start_time = new Date();
 
     const books = await Book.findAll({
+        logging: (sql, queryTime) => {
+            client.timing('SQL_FIND_ALL_BOOKs', queryTime)
+        },
         include: [
             {
                 model: db.files
