@@ -19,9 +19,6 @@ schema
     .has().not().spaces()                           // Should not have spaces
     .is().not().oneOf(['Passw0rd', 'Password123']); // Blacklist these values
 
-
-
-
 module.exports.createUser = async (req, res) => {
     // Validate request
     if (!req.body.username) {
@@ -86,13 +83,13 @@ module.exports.createUser = async (req, res) => {
                 });
 
             const { passwordHash, ...userWithoutPassword } = newUser
+            res.status(201).send(userWithoutPassword);
             logger.log({
                 level: 'info',
                 message: 'A new User is created.'
             });
             // 201 Created
             client.increment('created_a_new_user');
-            res.status(201).send(userWithoutPassword);
         }
 
     }
@@ -123,10 +120,14 @@ module.exports.updateUser = (req, res) => {
             .then(num => {
                 if (num == 1) {
                     const user = req.user;
-                    client.increment('updated_a_user');
                     res.send({
                         user
                     });
+                    logger.log({
+                        level: 'info',
+                        message: `User(id:${user.id}) is updated.`
+                    });
+                    client.increment('updated_a_user');
                 } else {
                     res.send({
                         message: `Cannot update User with username=${req.user.username}. Maybe Username was not found or req.body is empty!`
@@ -145,7 +146,11 @@ module.exports.showUser = (req, res) => {
     let user = '';
     if (req.user) {
         user = req.user;
+        logger.log({
+            level: 'info',
+            message: `Info of User(id:${user.id}) is queried.`
+        });
+        client.increment('get_user_info');
     }
-    client.increment('get_user_info');
     res.json(user)
 }

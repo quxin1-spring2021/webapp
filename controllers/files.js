@@ -9,7 +9,7 @@ const logger = require("../services/applogs/applogs");
 const client = require("../services/metrics/metrics");
 
 module.exports.addImage = async (req, res) => {
-
+    const apiStartTime = new Date();
     const { id } = req.params;
 
     let image = {
@@ -60,6 +60,7 @@ module.exports.addImage = async (req, res) => {
             ContentType: ftype // required
         }
         // we are sending buffer data to s3.
+
         S3.upload(params, async (err, s3res) => {
             if (err) {
                 res.send({ err, status: 'error' });
@@ -112,8 +113,15 @@ module.exports.addImage = async (req, res) => {
                                 file_id: image.file_id,
                             }
                         });
-                    client.increment('created_a_new_image');
+                    
                     res.status(201).send(newImage);
+                    logger.log({
+                        level: 'info',
+                        message: `created a new image, id: ${image.file_id}`
+                    });
+                    client.increment('created_a_new_image');
+                    const apiCostTime = new Date() - apiStartTime;
+                    client.timing('new_image_api_time', apiCostTime);
                 }
             }
 
@@ -126,6 +134,7 @@ module.exports.addImage = async (req, res) => {
 }
 
 module.exports.deleteImage = async (req, res) => {
+    const apiStartTime = new Date();
     const { id, image_id } = req.params;
 
     let image = await File.findOne(
@@ -187,10 +196,16 @@ module.exports.deleteImage = async (req, res) => {
             }
         });
 
-        client.increment('deleted_an_image');
         res.status(204).send({
             message: `Deleted.`
         });
+        logger.log({
+            level: 'info',
+            message: `deleted a image`
+        });
+        client.increment('deleted_an_image');
+        const apiCostTime = new Date() - apiStartTime;
+        client.timing('delete_a_image_api_time', apiCostTime);
     }
     return;
 

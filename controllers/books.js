@@ -209,8 +209,8 @@ module.exports.showAllBook = async (req, res) => {
             level: 'info',
             message: 'get all books request'
         });
-        client.increment('get_all_books');
         res.send(books);
+        client.increment('get_all_books');
     }
     const getBookTime = new Date() - start_time
     client.timing('get_all_book_API_time', getBookTime);
