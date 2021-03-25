@@ -16,13 +16,13 @@ permissions:
 hooks:
   BeforeInstall:
    - location: ./codedeploy/cleanup.sh
-     timeout: 180
+     timeout: 360
      runas: ubuntu
   AfterInstall:
    - location: ./codedeploy/dependencies.sh
-     timeout: 180
+     timeout: 360
      runas: ubuntu
   ApplicationStart:
    - location: ./codedeploy/start.sh
-     timeout: 180
+     timeout: 360
      runas: ubuntu
