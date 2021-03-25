@@ -90,6 +90,7 @@ module.exports.addImage = async (req, res) => {
                         },
                         where: {
                             file_name: image.file_name,
+                            book_id: id
                         }
                     })
                     .then(num => {

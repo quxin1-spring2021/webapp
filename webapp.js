@@ -38,7 +38,7 @@ const fileRoutes = require('./routes/files');
 // Set Database
 const db = require("./models");
 //{ force: true }
-db.sequelize.sync().then(() => {
+db.sequelize.sync({ force: true }).then(() => {
     console.log("Re-sync db.");
 });
 

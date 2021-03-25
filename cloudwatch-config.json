@@ -9,8 +9,13 @@
                 "collect_list": [
                     {
                         "file_path": "/home/ubuntu/webapp/services/applogs/webapp-combined.log",
-                        "log_group_name": "csye6225",
-                        "log_stream_name": "webapp"
+                        "log_group_name": "csye6225-webapp",
+                        "log_stream_name": "webapp-api"
+                    },
+                    {
+                        "file_path": "/home/ubuntu/webapp/services/applogs/runninglog.log",
+                        "log_group_name": "csye6225-webapp",
+                        "log_stream_name": "webapp-console"
                     }
                 ]
             }
@@ -22,7 +27,7 @@
             "statsd": {
                 "service_address":":8125",
                 "metrics_collection_interval":10,
-                "metrics_aggregation_interval":60
+                "metrics_aggregation_interval":30
             }
           }
         }

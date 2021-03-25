@@ -4,16 +4,9 @@ const File = db.files;
 const logger = require("../services/applogs/applogs");
 const client = require("../services/metrics/metrics");
 
-// function logging() {
-//     return (a,b) => {
-//         const queryTime = b;
-//         client.timing(`${queryName}`, queryTime)
-//     }
-// }
-
 module.exports.createBook = async (req, res) => {
     // Validate request
-
+    const startTime = new Date();
     // Create a Book
     const book = {
         title: req.body.title,
@@ -104,12 +97,15 @@ module.exports.createBook = async (req, res) => {
                 return newObj;
             });
         // 201 Created
+
+        res.status(201).send(newBook);
         logger.log({
             level: 'info',
             message: `created a new book, id: ${newBook.id}`
         });
         client.increment('POST_BOOK_API');
-        res.status(201).send(newBook);
+        const createBookApiTime = new Date() - startTime;
+        client.timing('POST_BOOK_API_time', createBookApiTime)
     }
 }
 

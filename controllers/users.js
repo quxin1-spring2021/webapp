@@ -20,6 +20,8 @@ schema
     .is().not().oneOf(['Passw0rd', 'Password123']); // Blacklist these values
 
 module.exports.createUser = async (req, res) => {
+    const start_time = new Date();
+
     // Validate request
     if (!req.body.username) {
         res.status(400).send({
@@ -100,12 +102,16 @@ module.exports.createUser = async (req, res) => {
             });
             // 201 Created
             client.increment('POST_USER_API');
+            const apiCostTime = new Date() - start_time
+            client.timing('POST_USER_API_time', apiCostTime);
         }
 
     }
 }
 
 module.exports.updateUser = (req, res) => {
+    const start_time = new Date();
+
     const { first_name, last_name, password, ...invalidFields } = req.body
     const putBody = {
         first_name: first_name,
@@ -141,6 +147,8 @@ module.exports.updateUser = (req, res) => {
                         message: `User(id:${user.id}) is updated.`
                     });
                     client.increment('PUT_USER_API');
+                    const apiCostTime = new Date() - start_time
+                    client.timing('PUT_USER_API_time', apiCostTime);
                 } else {
                     res.send({
                         message: `Cannot update User with username=${req.user.username}. Maybe Username was not found or req.body is empty!`
@@ -156,6 +164,8 @@ module.exports.updateUser = (req, res) => {
 }
 
 module.exports.showUser = (req, res) => {
+    const start_time = new Date();
+
     let user = '';
     if (req.user) {
         user = req.user;
@@ -164,6 +174,8 @@ module.exports.showUser = (req, res) => {
             message: `Info of User(id:${user.id}) is queried.`
         });
         client.increment('GET_USER_API');
+        const apiCostTime = new Date() - start_time
+        client.timing('GET_USER_API_time', apiCostTime);
     }
     res.json(user)
 }
