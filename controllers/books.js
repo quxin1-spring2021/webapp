@@ -97,6 +97,8 @@ module.exports.createBook = async (req, res) => {
 
 
 module.exports.showBook = async (req, res) => {
+    const start_time = new Data();
+
     const id = req.params.id;
     const book = await Book.findOne(
         {
@@ -144,21 +146,26 @@ module.exports.showBook = async (req, res) => {
         })
 
     if (book) {
+        res.send(book);
         logger.log({
             level: 'info',
             message: `get a book, id: ${id}`
         });
         client.increment('get_a_book');
-        res.send(book);
     } else {
         res.status(400).send({
             message: `Cannot find the book with id: ${id}`
         })
     }
+
+    const getBookTime = new Date() - start_time
+    client.timing('get_a_book_API_time', getBookTime);
 }
 
 
 module.exports.showAllBook = async (req, res) => {
+    const start_time = new Data();
+
     const books = await Book.findAll({
         include: [
             {
@@ -205,6 +212,8 @@ module.exports.showAllBook = async (req, res) => {
         client.increment('get_all_books');
         res.send(books);
     }
+    const getBookTime = new Date() - start_time
+    client.timing('get_all_book_API_time', getBookTime);
 }
 
 
