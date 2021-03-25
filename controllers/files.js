@@ -6,7 +6,7 @@ const UUID = require('uuid').v4;
 const Busboy = require('busboy')
 const S3 = new AWS.S3();
 const logger = require("../services/applogs/applogs");
-
+const client = require("../services/metrics/metrics");
 
 module.exports.addImage = async (req, res) => {
 
@@ -48,6 +48,7 @@ module.exports.addImage = async (req, res) => {
         file.on('end', function () {
             console.log('File [' + filename + '] Finished');
         });
+        client.increment('uploaded_an_object_to_s3');
     });
 
     busboy.on('finish', function () {
@@ -111,6 +112,7 @@ module.exports.addImage = async (req, res) => {
                                 file_id: image.file_id,
                             }
                         });
+                    client.increment('created_a_new_image');
                     res.status(201).send(newImage);
                 }
             }
@@ -185,6 +187,7 @@ module.exports.deleteImage = async (req, res) => {
             }
         });
 
+        client.increment('deleted_an_image');
         res.status(204).send({
             message: `Deleted.`
         });

@@ -6,6 +6,7 @@ const bcrypt = require('bcrypt');
 const passwordValidator = require('password-validator');
 const schema = new passwordValidator();
 const logger = require("../services/applogs/applogs");
+const client = require("../services/metrics/metrics");
 
 
 // Add properties to password validator schema
@@ -90,6 +91,7 @@ module.exports.createUser = async (req, res) => {
                 message: 'A new User is created.'
             });
             // 201 Created
+            client.increment('created_a_new_user');
             res.status(201).send(userWithoutPassword);
         }
 
@@ -121,6 +123,7 @@ module.exports.updateUser = (req, res) => {
             .then(num => {
                 if (num == 1) {
                     const user = req.user;
+                    client.increment('updated_a_user');
                     res.send({
                         user
                     });
@@ -143,5 +146,6 @@ module.exports.showUser = (req, res) => {
     if (req.user) {
         user = req.user;
     }
+    client.increment('get_user_info');
     res.json(user)
 }
