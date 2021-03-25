@@ -43,12 +43,14 @@ module.exports.createBook = async (req, res) => {
         })
     if (!existed) {
         // Save Book in the database
-        await Book.create({
-            book,
+        var log = {
             logging: (sql, queryTime) => {
                 client.timing('SQL_CREATE_BOOK_TIME', queryTime)
             }
-
+        }
+        await Book.create({
+            book,
+            log
         })
             .then(data => {
                 created = true;
