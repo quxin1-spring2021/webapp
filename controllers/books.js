@@ -29,6 +29,9 @@ module.exports.createBook = async (req, res) => {
     // check if this book is created
     await Book.findOne(
         {
+            logging: (sql, queryTime) => {
+                client.timing('SQL_FIND_BOOK', queryTime)
+            },
             where: {
                 isbn: book.isbn,
             }
@@ -63,6 +66,9 @@ module.exports.createBook = async (req, res) => {
     if (created) {
         const newBook = await Book.findOne(
             {
+                logging: (sql, queryTime) => {
+                    client.timing('SQL_FIND_BOOK', queryTime)
+                },
                 //raw: true,
                 where: {
                     isbn: book.isbn,
@@ -242,6 +248,9 @@ module.exports.deleteBook = async (req, res) => {
 
     let book = await Book.findOne(
         {
+            logging: (sql, queryTime) => {
+                client.timing('SQL_FIND_BOOK', queryTime)
+            },
             where: {
                 id: id,
             }
@@ -264,6 +273,9 @@ module.exports.deleteBook = async (req, res) => {
 
     await File.destroy(
         {
+            logging: (sql, queryTime) => {
+                client.timing('SQL_DELETE_IMAGE', queryTime)
+            },
             where: {
                 book_id: id,
             }
@@ -272,6 +284,9 @@ module.exports.deleteBook = async (req, res) => {
 
     await Book.destroy(
         {
+            logging: (sql, queryTime) => {
+                client.timing('SQL_DELETE_BOOK', queryTime)
+            },
             where: {
                 id: id,
             }
@@ -280,6 +295,9 @@ module.exports.deleteBook = async (req, res) => {
 
     book = await Book.findOne(
         {
+            logging: (sql, queryTime) => {
+                client.timing('SQL_FIND_BOOK', queryTime)
+            },
             where: {
                 id: id,
             }

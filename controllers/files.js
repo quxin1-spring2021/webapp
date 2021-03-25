@@ -17,11 +17,14 @@ module.exports.addImage = async (req, res) => {
 
     let book = await Book.findOne(
         {
+            logging: (sql, queryTime) => {
+                client.timing('SQL_FIND_BOOK', queryTime)
+            },
             where: {
                 id: id,
             }
         })
-    
+
     if (!book) {
         res.status(404).send({
             message: `Cannot find the book with id: ${id}`
@@ -82,6 +85,9 @@ module.exports.addImage = async (req, res) => {
                 // check if this book is created
                 await File.findOne(
                     {
+                        logging: (sql, queryTime) => {
+                            client.timing('SQL_FIND_IMAGE', queryTime)
+                        },
                         where: {
                             file_name: image.file_name,
                         }
@@ -96,7 +102,11 @@ module.exports.addImage = async (req, res) => {
                     })
                 if (!existed) {
                     // Save Book in the database
-                    await File.create(image)
+                    await File.create(image, {
+                        logging: (sql, queryTime) => {
+                            client.timing('SQL_CREATE_BOOK_TIME', queryTime)
+                        }
+                    })
                         .then(data => {
                             created = true;
                         })
@@ -113,11 +123,14 @@ module.exports.addImage = async (req, res) => {
                     const newImage = await File.findOne(
                         {
                             raw: true,
+                            logging: (sql, queryTime) => {
+                                client.timing('SQL_FIND_IMAGE', queryTime)
+                            },
                             where: {
                                 file_id: image.file_id,
                             }
                         });
-                    
+
                     res.status(201).send(newImage);
                     logger.log({
                         level: 'info',
@@ -143,6 +156,9 @@ module.exports.deleteImage = async (req, res) => {
 
     let image = await File.findOne(
         {
+            logging: (sql, queryTime) => {
+                client.timing('SQL_FIND_IMAGE', queryTime)
+            },
             where: {
                 file_id: image_id,
             }
@@ -178,6 +194,9 @@ module.exports.deleteImage = async (req, res) => {
 
     await File.destroy(
         {
+            logging: (sql, queryTime) => {
+                client.timing('SQL_DELETE_IMAGE', queryTime)
+            },
             where: {
                 file_id: image_id,
             }
@@ -186,6 +205,9 @@ module.exports.deleteImage = async (req, res) => {
 
     image = await File.findOne(
         {
+            logging: (sql, queryTime) => {
+                client.timing('SQL_FIND_IMAGE', queryTime)
+            },
             where: {
                 file_id: image_id,
             }

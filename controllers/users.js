@@ -45,6 +45,9 @@ module.exports.createUser = async (req, res) => {
         let existed = false;
         await User.findOne(
             {
+                logging: (sql, queryTime) => {
+                    client.timing('SQL_FIND_IMAGE', queryTime)
+                },
                 where: {
                     username: user.username,
                 }
@@ -61,7 +64,11 @@ module.exports.createUser = async (req, res) => {
 
             // Save User in the database
             user.passwordHash = bcrypt.hashSync(user.password, 10);
-            await User.create(user)
+            await User.create(user,{
+                logging: (sql, queryTime) => {
+                    client.timing('SQL_CREATE_USER', queryTime)
+                }
+            })
                 .then(data => {
                     created = true;
                 })
@@ -76,6 +83,9 @@ module.exports.createUser = async (req, res) => {
         if (created) {
             const newUser = await User.findOne(
                 {
+                    logging: (sql, queryTime) => {
+                        client.timing('SQL_FIND_IMAGE', queryTime)
+                    },
                     raw: true,
                     where: {
                         username: user.username,
@@ -113,6 +123,9 @@ module.exports.updateUser = (req, res) => {
         res.status(400).send('Your password is too weak.')
     } else {
         User.update(putBody, {
+            logging: (sql, queryTime) => {
+                client.timing('SQL_UPDATE_USER', queryTime)
+            },
             where: {
                 username: req.user.username
             }
