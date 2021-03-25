@@ -5,7 +5,7 @@ const AWS = require('aws-sdk');
 const UUID = require('uuid').v4;
 const Busboy = require('busboy')
 const S3 = new AWS.S3();
-const logger = require("../applogs/applogs");
+const logger = require("../services/applogs/applogs");
 
 
 module.exports.addImage = async (req, res) => {

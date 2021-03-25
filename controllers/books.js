@@ -1,10 +1,8 @@
 const db = require("../models");
 const Book = db.books;
 const File = db.files;
-const logger = require("../applogs/applogs");
-const StatsD = require("hot-shots");
-
-client = new StatsD();
+const logger = require("../services/applogs/applogs");
+const client = require("../services/metrics/metrics");
 
 module.exports.createBook = async (req, res) => {
     // Validate request
@@ -88,6 +86,10 @@ module.exports.createBook = async (req, res) => {
                 return newObj;
             });
         // 201 Created
+        logger.log({
+            level: 'info',
+            message: `created a new book, id: ${id}`
+        });
         client.increment('created_new_book');
         res.status(201).send(newBook);
     }
@@ -108,7 +110,7 @@ module.exports.showBook = async (req, res) => {
             ]
         })
         .then(book => {
-            if(book === null) {
+            if (book === null) {
                 return Promise.reject();
             }
 
@@ -142,6 +144,10 @@ module.exports.showBook = async (req, res) => {
         })
 
     if (book) {
+        logger.log({
+            level: 'info',
+            message: `get a book, id: ${id}`
+        });
         client.increment('get_a_book');
         res.send(book);
     } else {
@@ -194,7 +200,7 @@ module.exports.showAllBook = async (req, res) => {
     if (books) {
         logger.log({
             level: 'info',
-            message: 'get all books'
+            message: 'get all books request'
         });
         client.increment('get_all_books');
         res.send(books);
@@ -219,11 +225,11 @@ module.exports.deleteBook = async (req, res) => {
         return;
     }
 
-    
-    if(book.user_id !== req.user.id) {
+
+    if (book.user_id !== req.user.id) {
         res.status(401).send({
             message: `Unauthorized Action.`
-        }) 
+        })
         return;
     }
 
@@ -251,6 +257,11 @@ module.exports.deleteBook = async (req, res) => {
         })
 
     if (!book) {
+        logger.log({
+            level: 'info',
+            message: 'A Book is Deleted'
+        });
+        client.increment('delete_a_book');
         res.status(204).send({
             message: `Deleted.`
         });

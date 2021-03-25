@@ -7,14 +7,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const app = express();
-const logger = require("./applogs/applogs");
-
-var fs = require('fs');
-
-fs.appendFile('mynewfile1.txt', 'Hello content!', function (err) {
-  if (err) throw err;
-  console.log('Saved!');
-});
+const logger = require("./services/applogs/applogs");
 
 logger.log({
     level: 'info',
@@ -61,7 +54,6 @@ app.get("/", (req, res) => {
 
 app.use('/v1/user', userRoutes);
 app.use('/mybooks', bookRoutes);
-//app.use('/books/:id/image', fileRoutes);
 
 const PORT = process.env.PORT || 8080;
 
