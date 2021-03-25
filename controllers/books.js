@@ -97,7 +97,7 @@ module.exports.createBook = async (req, res) => {
 
 
 module.exports.showBook = async (req, res) => {
-    const start_time = new Data();
+    const start_time = new Date();
 
     const id = req.params.id;
     const book = await Book.findOne(
@@ -164,7 +164,7 @@ module.exports.showBook = async (req, res) => {
 
 
 module.exports.showAllBook = async (req, res) => {
-    const start_time = new Data();
+    const start_time = new Date();
 
     const books = await Book.findAll({
         include: [
