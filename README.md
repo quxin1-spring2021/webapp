@@ -1,4 +1,4 @@
-# WebApp
+# WebApp - Demo
 Web Application using technology stack that meets Cloud Native Web Application Requirements.
 Demo
 This Assignment implementing backend APIs for the web application.
