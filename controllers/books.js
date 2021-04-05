@@ -1,8 +1,19 @@
 const db = require("../models");
-const Book = db.books;
-const File = db.files;
+const AWS = require('aws-sdk');
 const logger = require("../services/applogs/applogs");
 const client = require("../services/metrics/metrics");
+AWS.config.update({region: "us-west-2"});
+
+
+const Book = db.books;
+const File = db.files;
+
+var params_create = {
+    Message: "A Book was Created", /* required */
+    TopicArn: "arn:aws:sns:us-west-2:973459261718:createBook"
+  };
+
+
 
 module.exports.createBook = async (req, res) => {
     // Validate request
@@ -106,6 +117,22 @@ module.exports.createBook = async (req, res) => {
         client.increment('POST_BOOK_API');
         const createBookApiTime = new Date() - startTime;
         client.timing('POST_BOOK_API_time', createBookApiTime)
+
+        // sending SNS message
+        var params_create = {
+            Message: "A Book was Created", /* required */
+            TopicArn: "arn:aws:sns:us-west-2:973459261718:createBook"
+          };
+        var publishTextPromise = new AWS.SNS({apiVersion: '2010-03-31'}).publish(params_create).promise();
+        publishTextPromise.then(
+            function(data) {
+              console.log(`Message ${params_create.Message} sent to the topic ${params_create.TopicArn}`);
+              console.log("MessageID is " + data.MessageId);
+            }).catch(
+              function(err) {
+              console.error(err, err.stack);
+            });
+
     }
 }
 
@@ -310,6 +337,19 @@ module.exports.deleteBook = async (req, res) => {
         client.increment('DELETE_BOOK_API');
         const deleteBookTime = new Date() - start_time
         client.timing('DELETE_BOOK_API_time', deleteBookTime);
+        var params_delete = {
+            Message: "A Book was deleted", /* required */
+            TopicArn: "arn:aws:sns:us-west-2:973459261718:deleteBook"
+        };
+        var publishTextPromise = new AWS.SNS({apiVersion: '2010-03-31'}).publish(params_delete).promise();
+        publishTextPromise.then(
+            function(data) {
+              console.log(`Message ${params_delete.Message} sent to the topic ${params_delete.TopicArn}`);
+              console.log("MessageID is " + data.MessageId);
+            }).catch(
+              function(err) {
+              console.error(err, err.stack);
+            });
     }
     return;
 
