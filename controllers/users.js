@@ -109,8 +109,9 @@ module.exports.createUser = async (req, res) => {
     }
 }
 
-module.exports.updateUser = (req, res) => {
+module.exports.updateUser = async (req, res) => {
     const start_time = new Date();
+    let updated = false;
 
     const { first_name, last_name, password, ...invalidFields } = req.body
     const putBody = {
@@ -128,7 +129,7 @@ module.exports.updateUser = (req, res) => {
     } else if (!schema.validate(putBody.password)) {
         res.status(400).send('Your password is too weak.')
     } else {
-        User.update(putBody, {
+        await User.update(putBody, {
             logging: (sql, queryTime) => {
                 client.timing('SQL_UPDATE_USER', queryTime)
             },
@@ -138,17 +139,8 @@ module.exports.updateUser = (req, res) => {
         })
             .then(num => {
                 if (num == 1) {
-                    const user = req.user;
-                    res.send({
-                        user
-                    });
-                    logger.log({
-                        level: 'info',
-                        message: `User(id:${user.id}) is updated.`
-                    });
-                    client.increment('PUT_USER_API');
-                    const apiCostTime = new Date() - start_time
-                    client.timing('PUT_USER_API_time', apiCostTime);
+                    updated = true;
+                    return;
                 } else {
                     res.send({
                         message: `Cannot update User with username=${req.user.username}. Maybe Username was not found or req.body is empty!`
@@ -160,6 +152,29 @@ module.exports.updateUser = (req, res) => {
                     message: "Error updating User with username=" + req.user.username
                 });
             });
+        if (updated) {
+            const newUser = await User.findOne(
+                {
+                    logging: (sql, queryTime) => {
+                        client.timing('SQL_FIND_USER', queryTime)
+                    },
+                    where: {
+                        username: req.user.username,
+                    }
+                });
+
+            res.send({
+                newUser
+            });
+            logger.log({
+                level: 'info',
+                message: `User(id:${newUser.id}) is updated.`
+            });
+            client.increment('PUT_USER_API');
+            const apiCostTime = new Date() - start_time
+            client.timing('PUT_USER_API_time', apiCostTime);
+        }
+
     }
 }
 
