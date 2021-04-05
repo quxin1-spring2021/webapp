@@ -120,7 +120,7 @@ module.exports.createBook = async (req, res) => {
 
         // sending SNS message
         var params_create = {
-            Message: "A Book was Created", /* required */
+            Message: `A Book with id ${newBook.id} was created under user ${req.user.username}. Check at dev.chuhsin.me/mybooks/${newBook.id}`, /* required */
             TopicArn: "arn:aws:sns:us-west-2:973459261718:createBook"
           };
         var publishTextPromise = new AWS.SNS({apiVersion: '2010-03-31'}).publish(params_create).promise();
@@ -338,7 +338,7 @@ module.exports.deleteBook = async (req, res) => {
         const deleteBookTime = new Date() - start_time
         client.timing('DELETE_BOOK_API_time', deleteBookTime);
         var params_delete = {
-            Message: "A Book was deleted", /* required */
+            Message: `A Book with id ${id} was deleted under user ${req.user.username}.`, /* required */
             TopicArn: "arn:aws:sns:us-west-2:973459261718:deleteBook"
         };
         var publishTextPromise = new AWS.SNS({apiVersion: '2010-03-31'}).publish(params_delete).promise();
