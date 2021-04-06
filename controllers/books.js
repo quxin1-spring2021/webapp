@@ -8,13 +8,6 @@ AWS.config.update({region: "us-west-2"});
 const Book = db.books;
 const File = db.files;
 
-var params_create = {
-    Message: "A Book was Created", /* required */
-    TopicArn: "arn:aws:sns:us-west-2:973459261718:createBook"
-  };
-
-
-
 module.exports.createBook = async (req, res) => {
     // Validate request
     const startTime = new Date();
@@ -121,10 +114,22 @@ module.exports.createBook = async (req, res) => {
         // sending SNS message
         var params_create = {
             Message: `A Book with id ${newBook.id} was created under user ${req.user.username}. Check at dev.chuhsin.me/mybooks/${newBook.id}`, /* required */
-            TopicArn: "arn:aws:sns:us-west-2:973459261718:createBook",
-            TestAttribute: "This is a test attribute, just want to know if it can accept anything.",
-            Email: `${req.user.username}`,
-            Operation: "create",
+            TopicArn: process.env.TOPIC_CREATE,
+            MessageAttributes:{
+                "Email":{
+                    "Type":"String",
+                    "Value":`${req.user.username}`
+                    },
+                
+                "Operation":{
+                    "Type":"String",
+                    "Value":"Create"
+                    },
+                "TestAttribute":{
+                    "Type":"String",
+                    "Value":"This is a test attribute, just want to know if it can accept anything."
+                    }
+                },
           };
         var publishTextPromise = new AWS.SNS({apiVersion: '2010-03-31'}).publish(params_create).promise();
         publishTextPromise.then(
@@ -342,9 +347,21 @@ module.exports.deleteBook = async (req, res) => {
         client.timing('DELETE_BOOK_API_time', deleteBookTime);
         var params_delete = {
             Message: `A Book with id ${id} was deleted under user ${req.user.username}.`, /* required */
-            TopicArn: "arn:aws:sns:us-west-2:973459261718:deleteBook",
-            TestAttribute: "This is a test attribute, just want to know if it can accept anything.",
-            email: `${req.user.username}`,
+            TopicArn: process.env.TOPIC_DELETE,
+            MessageAttributes:{
+                "Email":{
+                    "Type":"String",
+                    "Value":`${req.user.username}`
+                    },
+                "Operation":{
+                    "Type":"String",
+                    "Value":"Delete"
+                    },
+                "TestAttribute":{
+                    "Type":"String",
+                    "Value":"This is a test attribute, just want to know if it can accept anything."
+                    }
+                },
         };
         var publishTextPromise = new AWS.SNS({apiVersion: '2010-03-31'}).publish(params_delete).promise();
         publishTextPromise.then(
