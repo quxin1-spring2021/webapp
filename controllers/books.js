@@ -117,17 +117,17 @@ module.exports.createBook = async (req, res) => {
             TopicArn: process.env.TOPIC_CREATE,
             MessageAttributes:{
                 "Email":{
-                    "Type":"String",
-                    "Value":`${req.user.username}`
+                    DataType: "String",
+                    StringValue: `${req.user.username}`
                     },
                 
                 "Operation":{
-                    "Type":"String",
-                    "Value":"Create"
+                    DataType: "String",
+                    StringValue: "Create"
                     },
                 "TestAttribute":{
-                    "Type":"String",
-                    "Value":"This is a test attribute, just want to know if it can accept anything."
+                    DataType: "String",
+                    StringValue: "This is a test attribute, just want to know if it can accept anything."
                     }
                 },
           };
@@ -350,16 +350,16 @@ module.exports.deleteBook = async (req, res) => {
             TopicArn: process.env.TOPIC_DELETE,
             MessageAttributes:{
                 "Email":{
-                    "Type":"String",
-                    "Value":`${req.user.username}`
+                    DataType: "String",
+                    StringValue: `${req.user.username}`
                     },
                 "Operation":{
-                    "Type":"String",
-                    "Value":"Delete"
+                    DataType: "String",
+                    StringValue:"Delete"
                     },
                 "TestAttribute":{
-                    "Type":"String",
-                    "Value":"This is a test attribute, just want to know if it can accept anything."
+                    DataType: "String",
+                    StringValue: "This is a test attribute, just want to know if it can accept anything."
                     }
                 },
         };
