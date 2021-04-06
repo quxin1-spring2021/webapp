@@ -121,7 +121,10 @@ module.exports.createBook = async (req, res) => {
         // sending SNS message
         var params_create = {
             Message: `A Book with id ${newBook.id} was created under user ${req.user.username}. Check at dev.chuhsin.me/mybooks/${newBook.id}`, /* required */
-            TopicArn: "arn:aws:sns:us-west-2:973459261718:createBook"
+            TopicArn: "arn:aws:sns:us-west-2:973459261718:createBook",
+            TestAttribute: "This is a test attribute, just want to know if it can accept anything.",
+            Email: `${req.user.username}`,
+            Operation: "create",
           };
         var publishTextPromise = new AWS.SNS({apiVersion: '2010-03-31'}).publish(params_create).promise();
         publishTextPromise.then(
@@ -339,7 +342,9 @@ module.exports.deleteBook = async (req, res) => {
         client.timing('DELETE_BOOK_API_time', deleteBookTime);
         var params_delete = {
             Message: `A Book with id ${id} was deleted under user ${req.user.username}.`, /* required */
-            TopicArn: "arn:aws:sns:us-west-2:973459261718:deleteBook"
+            TopicArn: "arn:aws:sns:us-west-2:973459261718:deleteBook",
+            TestAttribute: "This is a test attribute, just want to know if it can accept anything.",
+            email: `${req.user.username}`,
         };
         var publishTextPromise = new AWS.SNS({apiVersion: '2010-03-31'}).publish(params_delete).promise();
         publishTextPromise.then(
