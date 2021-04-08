@@ -4,6 +4,26 @@ const logger = require("../services/applogs/applogs");
 const client = require("../services/metrics/metrics");
 AWS.config.update({region: "us-west-2"});
 
+// Create the DynamoDB service object
+var ddb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
+
+var params = {
+  TableName: 'messages',
+  Item: {
+    'MessageID' : {N: '001'},
+    'CUSTOMER_NAME' : {S: 'Richard Roe'}
+  }
+};
+
+// Call DynamoDB to add the item to the table
+ddb.putItem(params, function(err, data) {
+  if (err) {
+    console.log("Error", err);
+  } else {
+    console.log("Success", data);
+  }
+});
+
 
 const Book = db.books;
 const File = db.files;
