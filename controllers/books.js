@@ -1,8 +1,12 @@
 const db = require("../models");
-const Book = db.books;
-const File = db.files;
+const AWS = require('aws-sdk');
+const UUID = require('uuid').v4;
 const logger = require("../services/applogs/applogs");
 const client = require("../services/metrics/metrics");
+AWS.config.update({region: "us-west-2"});
+
+const Book = db.books;
+const File = db.files;
 
 module.exports.createBook = async (req, res) => {
     // Validate request
@@ -106,6 +110,42 @@ module.exports.createBook = async (req, res) => {
         client.increment('POST_BOOK_API');
         const createBookApiTime = new Date() - startTime;
         client.timing('POST_BOOK_API_time', createBookApiTime)
+
+        // sending SNS message
+        const msgId = UUID();
+        var params_create = {
+            Message: `A Book with id ${newBook.id} was created under user ${req.user.username}. Check at ${process.env.run_profile}.chuhsin.me/mybooks/${newBook.id}`, /* required */
+            TopicArn: process.env.TOPIC_CREATE,
+            MessageAttributes:{
+                "Email":{
+                    DataType: "String",
+                    StringValue: `${req.user.username}`
+                    },
+                
+                "Operation":{
+                    DataType: "String",
+                    StringValue: "Create"
+                    },
+                "MessageId":{
+                    DataType: "String",
+                    StringValue: `${msgId}`
+                    },
+                "BookId":{
+                    DataType: "String",
+                    StringValue: `${newBook.id}`
+                    }
+                },
+          };
+        var publishTextPromise = new AWS.SNS({apiVersion: '2010-03-31'}).publish(params_create).promise();
+        publishTextPromise.then(
+            function(data) {
+              console.log(`Message ${params_create.Message} sent to the topic ${params_create.TopicArn}`);
+              console.log("MessageID is " + data.MessageId);
+            }).catch(
+              function(err) {
+              console.error(err, err.stack);
+            });
+
     }
 }
 
@@ -310,6 +350,38 @@ module.exports.deleteBook = async (req, res) => {
         client.increment('DELETE_BOOK_API');
         const deleteBookTime = new Date() - start_time
         client.timing('DELETE_BOOK_API_time', deleteBookTime);
+        const msgId = UUID();
+        var params_delete = {
+            Message: `A Book with id ${id} was deleted under user ${req.user.username}.`, /* required */
+            TopicArn: process.env.TOPIC_DELETE,
+            MessageAttributes:{
+                "Email":{
+                    DataType: "String",
+                    StringValue: `${req.user.username}`
+                    },
+                "Operation":{
+                    DataType: "String",
+                    StringValue:"Delete"
+                    },
+                "MessageId":{
+                    DataType: "String",
+                    StringValue: `${msgId}`
+                    },
+                "BookId":{
+                    DataType: "String",
+                    StringValue: `${id}`
+                    }
+                },
+        };
+        var publishTextPromise = new AWS.SNS({apiVersion: '2010-03-31'}).publish(params_delete).promise();
+        publishTextPromise.then(
+            function(data) {
+              console.log(`Message ${params_delete.Message} sent to the topic ${params_delete.TopicArn}`);
+              console.log("MessageID is " + data.MessageId);
+            }).catch(
+              function(err) {
+              console.error(err, err.stack);
+            });
     }
     return;
 
