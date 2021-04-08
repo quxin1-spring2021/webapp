@@ -114,7 +114,7 @@ module.exports.createBook = async (req, res) => {
         // sending SNS message
         const msgId = UUID();
         var params_create = {
-            Message: `A Book with id ${newBook.id} was created under user ${req.user.username}. Check at dev.chuhsin.me/mybooks/${newBook.id}`, /* required */
+            Message: `A Book with id ${newBook.id} was created under user ${req.user.username}. Check at ${process.env.run_profile}.chuhsin.me/mybooks/${newBook.id}`, /* required */
             TopicArn: process.env.TOPIC_CREATE,
             MessageAttributes:{
                 "Email":{
