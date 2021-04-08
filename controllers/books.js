@@ -16,13 +16,7 @@ var params = {
 };
 
 // Call DynamoDB to add the item to the table
-ddb.putItem(params, function(err, data) {
-  if (err) {
-    console.log("Error", err);
-  } else {
-    console.log("Success", data);
-  }
-});
+
 
 
 const Book = db.books;
@@ -160,7 +154,13 @@ module.exports.createBook = async (req, res) => {
               function(err) {
               console.error(err, err.stack);
             });
-
+        ddb.putItem(params, function(err, data) {
+            if (err) {
+                console.log("Error", err);
+            } else {
+                console.log("Success", data);
+            }
+            });
     }
 }
 
