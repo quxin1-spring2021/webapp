@@ -136,6 +136,10 @@ module.exports.createBook = async (req, res) => {
                 "TestAttribute":{
                     DataType: "String",
                     StringValue: "This is a test attribute, just want to know if it can accept anything."
+                    },
+                "BookId":{
+                    DataType: "String",
+                    StringValue: `${newBook.id}`
                     }
                 },
           };
@@ -144,20 +148,6 @@ module.exports.createBook = async (req, res) => {
             function(data) {
               console.log(`Message ${params_create.Message} sent to the topic ${params_create.TopicArn}`);
               console.log("MessageID is " + data.MessageId);
-              var params = {
-                TableName: 'messages',
-                Item: {
-                    'MessageID' : {S: `${data.MessageId}`},
-                    'CUSTOMER_NAME' : {S: 'Richard Roe'}
-                }
-                };    
-            ddb.putItem(params, function(err, data) {
-                if (err) {
-                    console.log("Error", err);
-                } else {
-                    console.log("Success", data);
-                }
-                });
             }).catch(
               function(err) {
               console.error(err, err.stack);
