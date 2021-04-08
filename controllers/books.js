@@ -366,6 +366,10 @@ module.exports.deleteBook = async (req, res) => {
                 "MessageId":{
                     DataType: "String",
                     StringValue: `${msgId}`
+                    },
+                "BookId":{
+                    DataType: "String",
+                    StringValue: `${id}`
                     }
                 },
         };
