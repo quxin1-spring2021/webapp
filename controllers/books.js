@@ -1,5 +1,6 @@
 const db = require("../models");
 const AWS = require('aws-sdk');
+const UUID = require('uuid').v4;
 const logger = require("../services/applogs/applogs");
 const client = require("../services/metrics/metrics");
 AWS.config.update({region: "us-west-2"});
