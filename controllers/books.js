@@ -4,15 +4,6 @@ const logger = require("../services/applogs/applogs");
 const client = require("../services/metrics/metrics");
 AWS.config.update({region: "us-west-2"});
 
-// Create the DynamoDB service object
-var ddb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
-
-
-
-// Call DynamoDB to add the item to the table
-
-
-
 const Book = db.books;
 const File = db.files;
 
@@ -120,6 +111,7 @@ module.exports.createBook = async (req, res) => {
         client.timing('POST_BOOK_API_time', createBookApiTime)
 
         // sending SNS message
+        const msgId = UUID();
         var params_create = {
             Message: `A Book with id ${newBook.id} was created under user ${req.user.username}. Check at dev.chuhsin.me/mybooks/${newBook.id}`, /* required */
             TopicArn: process.env.TOPIC_CREATE,
@@ -133,9 +125,9 @@ module.exports.createBook = async (req, res) => {
                     DataType: "String",
                     StringValue: "Create"
                     },
-                "TestAttribute":{
+                "MessageId":{
                     DataType: "String",
-                    StringValue: "This is a test attribute, just want to know if it can accept anything."
+                    StringValue: `${msgId}`
                     },
                 "BookId":{
                     DataType: "String",
@@ -357,6 +349,7 @@ module.exports.deleteBook = async (req, res) => {
         client.increment('DELETE_BOOK_API');
         const deleteBookTime = new Date() - start_time
         client.timing('DELETE_BOOK_API_time', deleteBookTime);
+        const msgId = UUID();
         var params_delete = {
             Message: `A Book with id ${id} was deleted under user ${req.user.username}.`, /* required */
             TopicArn: process.env.TOPIC_DELETE,
@@ -369,9 +362,9 @@ module.exports.deleteBook = async (req, res) => {
                     DataType: "String",
                     StringValue:"Delete"
                     },
-                "TestAttribute":{
+                "MessageId":{
                     DataType: "String",
-                    StringValue: "This is a test attribute, just want to know if it can accept anything."
+                    StringValue: `${msgId}`
                     }
                 },
         };
