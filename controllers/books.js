@@ -7,13 +7,7 @@ AWS.config.update({region: "us-west-2"});
 // Create the DynamoDB service object
 var ddb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
 
-var params = {
-  TableName: 'messages',
-  Item: {
-    'MessageID' : {N: '001'},
-    'CUSTOMER_NAME' : {S: 'Richard Roe'}
-  }
-};
+
 
 // Call DynamoDB to add the item to the table
 
@@ -150,17 +144,25 @@ module.exports.createBook = async (req, res) => {
             function(data) {
               console.log(`Message ${params_create.Message} sent to the topic ${params_create.TopicArn}`);
               console.log("MessageID is " + data.MessageId);
+              var params = {
+                TableName: 'messages',
+                Item: {
+                    'MessageID' : {S: `${data.MessageId}`},
+                    'CUSTOMER_NAME' : {S: 'Richard Roe'}
+                }
+                };    
+            ddb.putItem(params, function(err, data) {
+                if (err) {
+                    console.log("Error", err);
+                } else {
+                    console.log("Success", data);
+                }
+                });
             }).catch(
               function(err) {
               console.error(err, err.stack);
             });
-        ddb.putItem(params, function(err, data) {
-            if (err) {
-                console.log("Error", err);
-            } else {
-                console.log("Success", data);
-            }
-            });
+
     }
 }
 
