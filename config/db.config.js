@@ -12,9 +12,4 @@ module.exports = {
       acquire: 30000,
       idle: 10000,
     },
-    dialectOptions: {
-      ssl: {
-          ca: fs.readFileSync('./rds-ca-2019-root.pem')
-      }
   }
-  };
