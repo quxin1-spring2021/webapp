@@ -1,7 +1,7 @@
 # Books Management Web Application
 This is a Web Application uses technology stack that meets Cloud Native Web Application Requirements.
-This Application is designed to be use with whole infrastructures and AWS Lambda functions and GitHub Actions.
-
+This Application is designed to be use with whole infrastructures on AWS, AWS Lambda functions and GitHub Actions.
+- PS: This application is not designed to run locally.
 ## Features
 You can create users, who can make CRUD operations on books and manage images for books they created.
 
@@ -54,6 +54,28 @@ Add a image under a book.
 
 - **Auth**`DELETE /books/:id/image/:imageId` 
 Delete a image under a book.
+
+---
+
+### Tech Stack used:
+Node.js
+Express
+MySQL
+Mocha
+
+### AWS Components used:
+EC2 Instances, Security Groups, AMI, Auto Scaling, Load Balancer
+IAM
+RDS
+S3
+DynamoDB
+VPC
+CodeDeploy Logging, Metrics
+Route 53
+Lambda
+SNS
+SES
+Certificate Manager
 
 ----
 
