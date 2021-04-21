@@ -2,6 +2,7 @@ const userService = require('./service');
 
 module.exports = basicAuth;
 
+// basic authorization middleware
 async function basicAuth(req, res, next) {
 
     // check for basic auth header
@@ -18,6 +19,7 @@ async function basicAuth(req, res, next) {
         return res.status(401).json({ message: 'Invalid Authentication Credentials' });
     }
     (async() => {
+        // if authentication passed, update the user in request with the user without password
         const { passwordHash, ...userWithoutPassword } = user;
         req.user = userWithoutPassword;
     })()

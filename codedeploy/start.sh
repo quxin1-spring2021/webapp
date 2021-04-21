@@ -10,6 +10,8 @@ sudo npx kill-port 8080
 cd /home/ubuntu/webapp/
 
 # sudo nohup node webapp.js > /dev/null 2> /dev/null < /dev/null &
+
+# output console logging into running.log file, which can be checked at CloudWatch
 sudo node webapp.js > /home/ubuntu/webapp/services/applogs/runninglog.log 2> /home/ubuntu/webapp/services/applogs/runninglog.log &
 
 echo "starting application on 8080"

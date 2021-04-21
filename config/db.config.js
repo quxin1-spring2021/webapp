@@ -1,4 +1,6 @@
-const fs = require("fs")
+// read environment variables for rds db connection, env vars are read from .env file, which is created in codedeploy appspec workflow.
+// the originial env vars come from user data in launch configuration, values were set when infrastructures were created by Terrafrom
+
 module.exports = {
     HOST: process.env.RDS_HOSTNAME,
     USER: process.env.RDS_USERNAME,

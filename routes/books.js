@@ -5,15 +5,15 @@ const files = require('../controllers/files');
 const basicAuth = require("../middleware/basic-auth")
 
 router.route('/')
-    .get(books.showAllBook)
-    .post(basicAuth, books.createBook)
+    .get(books.showAllBook) // GET /books/
+    .post(basicAuth, books.createBook) // POST /books/
 
 router.route('/:id')
-    .get(books.showBook)
-    .delete(basicAuth, books.deleteBook)
+    .get(books.showBook) // GET /books/:id
+    .delete(basicAuth, books.deleteBook) // DELETE /books/:id
 
-router.post('/:id/image', basicAuth, files.addImage)
-
-router.delete('/:id/image/:image_id', basicAuth, files.deleteImage)
+router.post('/:id/image', basicAuth, files.addImage) // POST /books/:id/image/
+ 
+router.delete('/:id/image/:image_id', basicAuth, files.deleteImage) // DELETE /books/:id/image/:image_id
 
 module.exports = router;

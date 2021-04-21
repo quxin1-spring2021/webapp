@@ -8,13 +8,13 @@ const S3 = new AWS.S3();
 const logger = require("../services/applogs/applogs");
 const client = require("../services/metrics/metrics");
 
+// POST books/id/image
 module.exports.addImage = async (req, res) => {
     const apiStartTime = new Date();
     const { id } = req.params;
-
-    let image = {
-    }
-
+    // create image body
+    let image = {}
+    // confirm the book exist
     let book = await Book.findOne(
         {
             logging: (sql, queryTime) => {
@@ -29,10 +29,10 @@ module.exports.addImage = async (req, res) => {
         res.status(404).send({
             message: `Cannot find the book with id: ${id}`
         })
-
         return;
     }
 
+    // process image in the request body
     let chunks = [], fname, ftype, fEncoding;
     let busboy = new Busboy({ headers: req.headers });
     busboy.on('file', function (fieldname, file, filename, encoding, mimetype) {
@@ -45,8 +45,6 @@ module.exports.addImage = async (req, res) => {
             // console.log (chunks.length);
             chunks.push(data)
         });
-
-
 
         file.on('end', function () {
             console.log('File [' + filename + '] Finished');
@@ -69,7 +67,7 @@ module.exports.addImage = async (req, res) => {
             if (err) {
                 res.send({ err, status: 'error' });
             } else {
-
+                // image object is successfully uploaded to s3 bucket, create a record in db
                 const s3CostTime = new Date() - s3StartTime;
                 client.timing('S3_UPLOAD_time', s3CostTime);
 
@@ -120,6 +118,7 @@ module.exports.addImage = async (req, res) => {
                         });
                 }
 
+                //confirm the image record is created
                 if (created) {
                     const newImage = await File.findOne(
                         {
@@ -151,6 +150,7 @@ module.exports.addImage = async (req, res) => {
     req.pipe(busboy);
 }
 
+// DELETE books/id/image/image_id
 module.exports.deleteImage = async (req, res) => {
     const apiStartTime = new Date();
     const { id, image_id } = req.params;

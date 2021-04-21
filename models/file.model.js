@@ -1,6 +1,5 @@
 module.exports = (sequelize, Sequelize) => {
 
-
     const File = sequelize.define("file", {
       file_id: {
         primaryKey: true,

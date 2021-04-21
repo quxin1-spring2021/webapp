@@ -19,17 +19,18 @@ schema
     .has().not().spaces()                           // Should not have spaces
     .is().not().oneOf(['Passw0rd', 'Password123']); // Blacklist these values
 
+// POST user, create a new user
 module.exports.createUser = async (req, res) => {
     const start_time = new Date();
 
-    // Validate request
+    // request validation
     if (!req.body.username) {
         res.status(400).send({
             message: "Content can not be empty!"
         });
         return;
     }
-    // Create a User
+    // form a User object
     const user = {
         username: req.body.username,
         password: req.body.password,
@@ -45,6 +46,7 @@ module.exports.createUser = async (req, res) => {
     } else {
         let created = false;
         let existed = false;
+        // check if the user in request body existed
         await User.findOne(
             {
                 logging: (sql, queryTime) => {
@@ -62,9 +64,9 @@ module.exports.createUser = async (req, res) => {
                     });
                 }
             })
-        if (!existed) {
 
-            // Save User in the database
+        if (!existed) {
+            // Save the new User into database
             user.passwordHash = bcrypt.hashSync(user.password, 10);
             await User.create(user,{
                 logging: (sql, queryTime) => {
@@ -82,6 +84,7 @@ module.exports.createUser = async (req, res) => {
                 });
         }
 
+        // confirm the new user is created
         if (created) {
             const newUser = await User.findOne(
                 {
@@ -100,7 +103,7 @@ module.exports.createUser = async (req, res) => {
                 level: 'info',
                 message: 'A new User is created.'
             });
-            // 201 Created
+            // 201 Created, forming metrics and log
             client.increment('POST_USER_API');
             const apiCostTime = new Date() - start_time
             client.timing('POST_USER_API_time', apiCostTime);
@@ -109,11 +112,13 @@ module.exports.createUser = async (req, res) => {
     }
 }
 
+// PUT user
 module.exports.updateUser = async (req, res) => {
     const start_time = new Date();
     let updated = false;
 
     const { first_name, last_name, password, ...invalidFields } = req.body
+    // form updated user body
     const putBody = {
         first_name: first_name,
         last_name: last_name,
@@ -152,6 +157,8 @@ module.exports.updateUser = async (req, res) => {
                     message: "Error updating User with username=" + req.user.username
                 });
             });
+
+        // confirm the user is updated
         if (updated) {
             const newUser = await User.findOne(
                 {
@@ -178,6 +185,7 @@ module.exports.updateUser = async (req, res) => {
     }
 }
 
+// GET user
 module.exports.showUser = (req, res) => {
     const start_time = new Date();
 
