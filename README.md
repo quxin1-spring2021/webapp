@@ -70,7 +70,8 @@ RDS
 S3
 DynamoDB
 VPC
-CodeDeploy Logging, Metrics
+CloudWatch Logging, Metrics
+CodeDeploy
 Route 53
 Lambda
 SNS
